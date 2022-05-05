@@ -7,6 +7,7 @@
 #include <gsl/gsl_monte_plain.h>
 #include <gsl/gsl_monte_vegas.h>
 #include <gsl/gsl_monte_miser.h>
+#include <gsl/gsl_sf_coupling.h>
 // #include <wignerSymbols>
 // #include "wignerSymbols/wignerSymbols-cpp.h"
 // #include<gsl>
@@ -147,9 +148,9 @@ using namespace std;
         for (auto L : irange(Lmin, Lmax+1)) {
             if ( (oa.l+oc.l+L)%2 == 1 ) {continue;}
             if ( (ob.l+od.l+L)%2 == 1 ) {continue;}
-            int angular = wigner6j(oa.j*0.5, ob.j*0.5, J, od.j*0.5, oc.j*0.5, L) * \
-                            wigner3j(oa.j*0.5, L, oc.j*0.5, -0.5, 0, 0.5) * \
-                            wigner3j(ob.j*0.5, L, od.j*0.5, -0.5, 0, 0.5);
+            int angular = gsl_sf_coupling_6j(oa.j*0.5, ob.j*0.5, J, od.j*0.5, oc.j*0.5, L) * \
+                            gsl_sf_coupling_3j(oa.j*0.5, L, oc.j*0.5, -0.5, 0, 0.5) * \
+                            gsl_sf_coupling_3j(ob.j*0.5, L, od.j*0.5, -0.5, 0, 0.5);
 
             // Lambda double integral
             // auto lambda = [=](double r1, double r2) {return eval_radial_function_rspace(r1, zeta, Z, oa.e) * \
