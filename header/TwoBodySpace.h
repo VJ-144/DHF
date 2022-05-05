@@ -1,5 +1,5 @@
 #pragma once
-#include "Orbits.h"
+#include "../header/Orbits.h"
 
 class TwoBodyChannel : public Orbits {
 

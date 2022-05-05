@@ -11,11 +11,11 @@
 // #include "wignerSymbols/wignerSymbols-cpp.h"
 // #include<gsl>
 
-#include "TwoBodyOperator.h"
-#include "TwoBodySpace.h"
-#include "ModelSpace.h"
-#include "Operator.h"
-#include "Orbits.h"
+#include "../header/TwoBodyOperator.h"
+#include "../header/TwoBodySpace.h"
+#include "../header/ModelSpace.h"
+#include "../header/Operator.h"
+#include "../header/Orbits.h"
 
 using namespace WignerSymbols;
 using namespace boost;

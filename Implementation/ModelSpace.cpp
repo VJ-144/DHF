@@ -1,7 +1,7 @@
 
-#include "Orbits.h"
-#include "ModelSpace.h"
-#include "TwoBodySpace.h"
+#include "../header/Orbits.h"
+#include "../header/ModelSpace.h"
+#include "../header/TwoBodySpace.h"
 
     OneBodySpace::OneBodySpace(Orbits orbits){
 

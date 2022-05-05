@@ -4,10 +4,10 @@
 #include <cmath>
 #include <gsl/gsl_integration.h>
 
-#include "Orbits.h"
-#include "ModelSpace.h"
-#include "TwoBodySpace.h"
-#include "TwoBodyOperator.h"
+#include "../header/Orbits.h"
+#include "../header/ModelSpace.h"
+#include "../header/TwoBodySpace.h"
+#include "../header/TwoBodyOperator.h"
 
 using namespace arma;
 using namespace std;
