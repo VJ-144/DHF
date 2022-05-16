@@ -14,7 +14,7 @@ class OneBodySpace : public TwoBodySpace{
         map <int, int> orbit_index_to_channel_index;
 
         
-        OneBodySpace(Orbits orbits=Orbits());
+        OneBodySpace(Orbits orbits1=Orbits());
 };
 
 
@@ -26,11 +26,11 @@ class ModelSpace : public OneBodySpace{
 
         int Z;
         int Ne;
-        int zeta;
+        double zeta;
         double c = 137.035999084;
 
-        ModelSpace(int Ne, int Z, int zeta, Orbits orbs);
-        ModelSpace(int Ne=1, int Z=1, int zeta=1);
+        ModelSpace(int Ne1, int Z1, double zeta1, Orbits orbs1);
+        ModelSpace(int N1e=1, int Z1=1, double zeta1=1);
 
         // Function Declerations
         void set_model_space_from_orbits(Orbits orbs);

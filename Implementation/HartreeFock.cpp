@@ -20,40 +20,42 @@ using namespace arma;
 
 
     void Monopole::set_monopole2(){
-        Orbits orbs = modelspace.orbits;
-        int norbs = orbs.get_num_orbits();
-        for (int i1=0; i1<norbs; i1++) {
-            Orbit o1 = orbs.get_orbit(i1);
-            for (int i3=0; i3<i1+1; i1++) {
-                Orbit o3 = orbs.get_orbit(i3);
-                for (int i2=0; i2<norbs; i2++) {
-                    for (int i4=0; i4<norbs; i4++) {
-                        Orbit o2 = orbs.get_orbit(i2);
-                        Orbit o4 = orbs.get_orbit(i4);
-                        if (o2.k != o4.k) {continue;}
-                        if (o1.e + o2.e != o3.e + o4.e) {continue;}
-                        idx_to_ijkl.push_back({i1,i2,i3,i4});
-                        double norm = 1;
-                        if (i1==i2) {norm *= sqrt(2);}
-                        if (i3==i4) {norm *= sqrt(2);}
-                        double v;
-                        for (int J : irange( floor(abs(o1.j-o2.j)/2),  floor((o1.j+o2.j)/2)+1 ) ) {
-                            if (i1==i2 && J%2==1) {continue;}
-                            if (i3==i4 && J%2==1) {continue;}
-                            // v += (2*J+1) * Ham.two.get_2bme_orbitsJ(o1,o2,o3,o4,J,J);
-                        v *= norm / (o1.j+1);
-                        v2.push_back(v);
-                        }
-                    }
-                }
-            }
-        }        
+        // Orbits orbs = modelspace.orbits;
+        // int norbs = orbs.get_num_orbits();
+        // for (int i1=0; i1<norbs; i1++) {
+        //     Orbit o1 = orbs.get_orbit(i1);
+        //     for (int i3=0; i3<i1+1; i1++) {
+        //         Orbit o3 = orbs.get_orbit(i3);
+        //         for (int i2=0; i2<norbs; i2++) {
+        //             for (int i4=0; i4<norbs; i4++) {
+        //                 Orbit o2 = orbs.get_orbit(i2);
+        //                 Orbit o4 = orbs.get_orbit(i4);
+        //                 if (o2.k != o4.k) {continue;}
+        //                 if (o1.e + o2.e != o3.e + o4.e) {continue;}
+        //                 idx_to_ijkl.push_back({i1,i2,i3,i4});
+        //                 double norm = 1;
+        //                 if (i1==i2) {norm *= sqrt(2);}
+        //                 if (i3==i4) {norm *= sqrt(2);}
+        //                 double v;
+        //                 for (int J : irange( floor(abs(o1.j-o2.j)/2),  floor((o1.j+o2.j)/2)+1 ) ) {
+        //                     if (i1==i2 && J%2==1) {continue;}
+        //                     if (i3==i4 && J%2==1) {continue;}
+        //                     v += (2*J+1) * Ham.two.get_2bme_orbitsJ(o1,o2,o3,o4,J,J);
+        //                 v *= norm / (o1.j+1);
+        //                 v2.push_back(v);
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }        
     }
 
     void Monopole::print_monopole2() {
         for (int idx=0; idx<idx_to_ijkl.size(); idx++) {
+            // printf("%d %d %d %d", idx_to_ijkl[idx][0], idx_to_ijkl[idx][1], idx_to_ijkl[idx][2], idx_to_ijkl[idx][3]);
             // cout << fixed << setw(2) << idx_to_ijkl[idx] << v2[idx] << endl;
             // idx_to_ijkl[idx] contains a vector so need to find a more efficient method
+            // need to add v2 but not sure about length of vector
         }
     }
 
@@ -66,7 +68,7 @@ using namespace arma;
             CalcEnergy();
             // _print_status(n_iter, detail=True);
             _print_status(n_iter, false);
-            if (r < 1.8e-8);
+            if (r < 1.8e-8) {break;};
         }
     }
 
@@ -120,7 +122,8 @@ using namespace arma;
         OneBodySpace one_body_space = modelspace.one;
         for (int ich=0; ich< one_body_space.number_channels; ich++) {
             vector <int> filter_idx = one_body_space.channels[ich];
-            // Figure out Hashmap stuff
+            mat A = conv_to<mat>::from(filter_idx);
+            A.print();
 
         }
     }
@@ -129,13 +132,14 @@ using namespace arma;
         OneBodySpace one_body_space = modelspace.one;
         Orbits orbs = modelspace.orbits;
         int norbs = orbs.get_num_orbits();
-        Mat<double> tmp(norbs, norbs, fill::zeros);
+        Mat<int> tmp(norbs, norbs, fill::zeros);
         Orbits orbs_tmp = Orbits();
         map<int, int> orbit_idx_to_spe_idx;
         for (int ich=0; ich<one_body_space.number_channels; ich++) {
             vector <int> filter_idx = one_body_space.channels[ich];
+            vec filter_idx1 = conv_to<vec>::from(filter_idx);
             // Fix SPEsCh
-            vec SPEsCh;
+            vec SPEsCh(filter_idx1);
             for (int i=0; i<one_body_space.channels[ich].size(); i++) {
                 int idx_spe = one_body_space.channels[ich][i];
                 if (orbs.relativistic) {
@@ -157,11 +161,23 @@ using namespace arma;
             }
         }
         for ( auto hole_idx : holes) {
-            // int occ = holes.first[hole_idx];
-            // int spe_idx = orbit_idx_to_spe_idx[hole_idx];
-
+            int occ = holes.at(hole_idx.first);
+            int spe_idx = orbit_idx_to_spe_idx.at(hole_idx.first);
+            tmp(spe_idx, spe_idx) = occ;
         }
+        rho = C * tmp * C.t();
+    }
 
-
-
+    void HartreeFock::_print_status(int n_iter, bool detail=true) {
+        printf("nth iteration: %d, HF energy: %3f ", n_iter, En);
+        if (detail) {
+            F.raw_print("Fock Matrix");
+            printf(" ");
+            SPEs.raw_print("SPEs");
+            printf(" ");
+            C.raw_print("Coeffs");
+            printf(" ");
+            rho.raw_print("Density Matrix");
+            printf(" ");
+        }
     }

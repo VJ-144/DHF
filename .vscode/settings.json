@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "iomanip": "cpp",
+        "iostream": "cpp",
+        "functional": "cpp",
+        "cmath": "cpp",
+        "ostream": "cpp",
+        "ranges": "cpp"
+    }
+}

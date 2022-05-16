@@ -47,7 +47,8 @@ int main() {
     ms.set_model_space_from_orbits(orbs);
     Operator Ham = Operator(ms, 0, 1, 0);
     Ham.set_hamiltonian(true, true);
-    // Ham.print_operator()
+    Ham.orthogonalize();
+    // Ham.print_operator();
 
 
     return(0);

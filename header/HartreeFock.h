@@ -17,12 +17,17 @@ class Monopole : public Operator {
 
     public:
         Operator Ham;
-        ModelSpace Ham = Ham.modelspace;
+        ModelSpace modelspace;
         vector < vector<int> > idx_to_ijkl;
         vector <double> v2;
 
         // Constructor
-        Monopole(Operator Ham1 = Operator());
+        Monopole(Operator Ham1 = Operator()) {
+            Ham=Ham1;
+            modelspace = Ham.modelspace;
+            idx_to_ijkl = {};
+            v2 = {};
+        };
 
         void set_monopole2();
         void print_monopole2();
@@ -32,28 +37,28 @@ class HartreeFock : public Monopole {
 
     public:
         Operator Ham;
-        map <int, int> holes;
-        ModelSpace modelspace = Ham.modelspace;
-        Monopole monopole = Monopole(Ham);
-        int norbs;
-        Orbits orbs;
-        Mat<double> C, rho, F, V;
-        // map< vector<int>, int> SPEs;
+        map <int, double> holes;
+        ModelSpace modelspace;
+        Monopole monopole;
+        // int norbs;
+        // Orbits orbs;
+        Mat<double> C, rho, F, V, S;
         dvec SPEs;
         // double r;
         double En;
 
         // Constructor
-        HartreeFock(Operator Ham1 = Operator()) {
+        HartreeFock(Operator Ham1, map <int, double> holes1) {
             En; // Not sure if this belongs here
-            Ham;
-            holes;
+            Ham = Ham1;
+            holes = holes1;
             modelspace = Ham.modelspace;
             monopole = Monopole(Ham);
+            monopole.set_monopole2();
 
-            orbs = modelspace.orbits;
-            norbs = orbs.get_num_orbits();
-            S = Ham.S;
+            Orbits orbs = modelspace.orbits;
+            int norbs = orbs.get_num_orbits();
+            S = Ham1.S;
             C.zeros(norbs, norbs);
             rho.zeros(norbs, norbs);
             F.zeros(norbs, norbs);
@@ -64,9 +69,7 @@ class HartreeFock : public Monopole {
             DiagonalizeFock();
             UpdateDensityMatrix();
             CalcEnergy();
-
-
-        }
+        };
 
         void solve();
         void CalcEnergy();

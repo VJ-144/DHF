@@ -3,9 +3,9 @@
 #include "../header/ModelSpace.h"
 #include "../header/TwoBodySpace.h"
 
-    OneBodySpace::OneBodySpace(Orbits orbits){
+    OneBodySpace::OneBodySpace(Orbits orbits1){
 
-        orbits = orbits;
+        orbits = orbits1;
         kappas;
         channels;
         orbit_index_to_channel_index;
@@ -24,20 +24,22 @@
         number_channels = channels.size();
     }
 
-    ModelSpace::ModelSpace(int Ne, int Z, int zeta, Orbits orbs){
+    ModelSpace::ModelSpace(int Ne1, int Z1, double zeta1, Orbits orbs){
         c;
-        Z=1;
-        Ne=1;
-        zeta=1;
+        Z=Z1;
+        Ne=Ne1;
+        zeta=zeta1;
+
+        // orbs = orbs1;
 
         set_model_space_from_orbits(orbs);
     }
 
-    ModelSpace::ModelSpace(int Ne, int Z, int zeta){
+    ModelSpace::ModelSpace(int Ne1, int Z1, double zeta1){
         c;
-        Z;
-        Ne;
-        zeta;
+        Z=Z1;
+        Ne=Ne1;
+        zeta=zeta1;
 
     }
     

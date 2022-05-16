@@ -56,13 +56,13 @@ using namespace std;
 
     void Operator::set_hamiltonian(bool one_body, bool two_body) {
         if (one_body) {set_one_body_ham();}
-        if (two_body) {set_two_body_ham();}
+        // if (two_body) {set_two_body_ham();}
     }
 
     void Operator::set_one_body_ham() {
         ModelSpace ms = modelspace;
         Orbits orbs = ms.orbits;
-        Mat<double> H, S;
+        Mat<double> H;
         H.zeros(orbs.get_num_orbits(), orbs.get_num_orbits());
         S.zeros(orbs.get_num_orbits(), orbs.get_num_orbits());
 
@@ -75,13 +75,19 @@ using namespace std;
                 if (oi.e==-1 && oj.e==-1) {fac =-1;}
                 if (oi.k!=oj.k) {continue;}
                 if (orbs.relativistic) {
+                    // cout << ms.zeta << ms.Z << endl;
+                    // cout << ME_NuclPot(oi,oj,ms.zeta,ms.Z) << endl;
+                    // cout << "realativistic " << ME_NuclPot(oi,oj,ms.zeta,ms.Z) << endl;
                     H(i,j) = ME_Kinetic(oi,oj,ms.zeta,ms.Z) - ms.Z * ME_NuclPot(oi,oj,ms.zeta,ms.Z) + ME_overlap(oi,oj,ms.zeta,ms.Z) * pow(ms.c, 2) * (fac-1);
                 } else {
+                    // cout << "realativistic " << ME_NuclPot(oi,oj,ms.zeta,ms.Z) << endl;
                     H(i,j) = ME_Kinetic_nonrel(oi,oj,ms.zeta) - ms.Z * ME_NuclPot(oi,oj,ms.zeta,ms.Z);
                 }
                 S(i,j) = ME_overlap(oi,oj,ms.zeta,ms.Z);
             }
         }
+        // S.print("S");
+        // H.print("H");
         one = H;
     }
 
@@ -110,102 +116,79 @@ using namespace std;
                     if (c==d) {norm /= sqrt(2);}
                     double v;
                     // Commented out for debugging _coulomb
-                    // v = _coulomb(oa, ob, oc, od, chket.J);
-                    // v += _coulomb(oa, ob, od, oc, chket.J) * pow( (-1), ( floor( (oc.j+od.j)/2) - chket.J + 1) );
+                    v = _coulomb(oa, ob, oc, od, chket.J);
+                    v += _coulomb(oa, ob, od, oc, chket.J) * pow( (-1), ( floor( (oc.j+od.j)/2) - chket.J + 1) );
                     v *= norm;
-                    // two.set_2bme(channels.first[0], channels.first[0], idxbra, idxket, v);
+                    // Not sure if right index for channels
+                    two.set_2bme(channels.first[0], channels.first[1], idxbra, idxket, v);
                     // two.set_2bme(channels.first[0], channels.first[0], idxbra, idxket, v);
                 }
             }
         }
     }
 
-    double g(double *r, size_t dim, void *params) {
-        (void)(dim); /* avoid unused parameter warnings */
-        int& Z = ((int *)params)[0];
-        int& zeta = ((int *)params)[1];
-        int& L = ((int *)params)[2];
-        Orbit& oa = ((Orbit *)params)[3];
-        Orbit& ob = ((Orbit *)params)[4];
-        Orbit& oc = ((Orbit *)params)[5];
-        Orbit& od = ((Orbit *)params)[6];
-
-        return oa.eval_radial_function_rspace(r[0], zeta, Z, oa.e) * \
-                        ob.eval_radial_function_rspace(r[1], zeta, Z, ob.e) * \
-                        oc.eval_radial_function_rspace(r[0], zeta, Z, oc.e) * \
-                        od.eval_radial_function_rspace(r[1], zeta, Z, od.e) * \
-                        pow( min(r[0],r[1]), L) / pow( max(r[0],r[1]), (L+1) ) * oa.e * ob.e;
-    }
-    
-    double Operator::_coulomb(Orbit oa, Orbit ob, Orbit oc, Orbit od, int J) {
+    double Operator::_coulomb(Orbit& oa, Orbit& ob, Orbit& oc, Orbit& od, int J) {
         if (oa.e != oc.e) {return 0.0;}
         if (ob.e != od.e) {return 0.0;}
         int zeta = modelspace.zeta;
         int Z = modelspace.Z;
         int Lmin = floor( max( abs(oa.j-oc.j), abs(ob.j-od.j) )/2 );
         int Lmax = floor( min( (oa.j+oc.j), (ob.j+od.j) )/2 );
+
+        double rmax = 20; 
+        int NMesh = 100;
+        gsl_integration_fixed_workspace *workspace;
+        const gsl_integration_fixed_type *T = gsl_integration_fixed_legendre;
+        workspace = gsl_integration_fixed_alloc(T, NMesh, 0.0, rmax, 0.0, 0.0);
         double r = 0.0;
         for (auto L : irange(Lmin, Lmax+1)) {
             if ( (oa.l+oc.l+L)%2 == 1 ) {continue;}
             if ( (ob.l+od.l+L)%2 == 1 ) {continue;}
-            int angular = gsl_sf_coupling_6j(oa.j*0.5, ob.j*0.5, J, od.j*0.5, oc.j*0.5, L) * \
-                            gsl_sf_coupling_3j(oa.j*0.5, L, oc.j*0.5, -0.5, 0, 0.5) * \
-                            gsl_sf_coupling_3j(ob.j*0.5, L, od.j*0.5, -0.5, 0, 0.5);
-
-            // Lambda double integral
-            // auto lambda = [=](double r1, double r2) {return eval_radial_function_rspace(r1, zeta, Z, oa.e) * \
-            //                                                     eval_radial_function_rspace(r2, zeta, Z, ob.e) * \
-            //                                                     eval_radial_function_rspace(r1, zeta, Z, oc.e) * \
-            //                                                     eval_radial_function_rspace(r2, zeta, Z, od.e) * \
-            //                                                     pow( min(r1,r2), L) / pow( max(r1,r2), (L+1) ) * oa.e * ob.e;};
-
-            double integral_res, err;
-
-
-            auto lower_limit = [=](double x) {return 0;};
-            auto upper_limit = [=](double x) {return 8;};
-            double xl[2] = { 0, 0 };
-            double xu[2] = { 8, 8 };
-
-            const gsl_rng_type *T;
-            gsl_rng *re;
-
-            gsl_monte_function G;
-            G.f = &g;
-            G.dim = 2;
-
-            // Struct for Monte Carlo Integration
-            struct my_f_params { int Z; int zeta; int L; Orbit oa; Orbit ob; Orbit oc; Orbit od; };
-            
-            struct my_f_params params = { Z, zeta, L, oa, ob, oc, od };
-            G.params = &params;
-
-            size_t calls = 5000000;
-            gsl_rng_env_setup();
-
-            T = gsl_rng_default;
-            re = gsl_rng_alloc(T);
-
-            gsl_monte_plain_state *s = gsl_monte_plain_alloc(2);
-            gsl_monte_plain_integrate(&G, xl, xu, 3, calls, re, s, &integral_res, &err);
-            gsl_monte_plain_free(s);
-
-            cout << integral_res << endl;
-            r += angular * integral_res;
-        }
+            if (abs(oa.l-oc.l) > L or oa.l+oc.l < L) continue;
+            if (abs(ob.l-od.l) > L or ob.l+od.l < L) continue;
+            double angular = gsl_sf_coupling_6j(oa.j, ob.j, 2*J, od.j, oc.j, 2*L) * \
+                             gsl_sf_coupling_3j(oa.j, 2*L, oc.j, -1, 0, 1) * \
+                             gsl_sf_coupling_3j(ob.j, 2*L, od.j, -1, 0, 1); 
+            double Integral = 0;
+            for (int i=0; i<NMesh; i++){
+              for (int j=0; j<NMesh; j++){
+                double x = workspace->x[i];
+                double wx = workspace->weights[i];
+                double y = workspace->x[j];
+                double wy = workspace->weights[j];
+                Integral += wx * wy * oa.eval_radial_function_rspace(x, zeta, Z, oa.e) * \
+                            ob.eval_radial_function_rspace(y, zeta, Z, ob.e) * \
+                            oc.eval_radial_function_rspace(x, zeta, Z, oc.e) * \
+                            od.eval_radial_function_rspace(y, zeta, Z, od.e) * \
+                            pow( min(x,y), L) / pow( max(x,y), (L+1) ) * oa.e * ob.e;
+              }   
+            }   
+            r += angular * Integral;
+        }   
         r *= sqrt( (oa.j+1) * (ob.j+1) * (oc.j+1) * (od.j+1) * pow( (-1), floor((oa.j+oc.j)/2)+J ) );
         return r;
-    }
+    }   
+
 
 
 
     void Operator::orthogonalize(bool scalar) {
         ModelSpace ms = modelspace;
-        two_body_space = ms.two;
+        TwoBodySpace two_body_space = ms.two;
         Orbits orbs = ms.orbits;
-        Mat<double> L = chol(S);
-        Mat<double> T = inv(L);
-        one = T * one * T.t();
+        // mat L(arma::size(S));
+        // L.print("L"); 
+        // S.print("S");
+        mat L = arma::chol(S, "lower");
+        // L.print("L");
+        Mat<double> T = arma::inv(L);
+        // one = T * one * T.t();
+        // L.print("L");
+        // T.print("T");
+        // one.print("one");
+
+
+
         if (scalar) {
             /*
             (ab:J|U1 x U2|cd:J) = [ (a|U|c) (b|U|d)
