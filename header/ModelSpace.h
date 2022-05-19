@@ -2,6 +2,8 @@
 #include "../header/Orbits.h"
 #include "../header/TwoBodySpace.h"
 
+#include <set>
+
 using namespace std;
 
 class OneBodySpace : public TwoBodySpace{
@@ -13,7 +15,6 @@ class OneBodySpace : public TwoBodySpace{
         vector<vector<int>> channels;
         map <int, int> orbit_index_to_channel_index;
 
-        
         OneBodySpace(Orbits orbits1=Orbits());
 };
 
