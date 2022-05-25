@@ -3,6 +3,11 @@
 #include "../header/ModelSpace.h"
 #include "../header/TwoBodySpace.h"
 
+#include <set>
+#include <armadillo>
+using namespace arma;
+using namespace std;
+
     OneBodySpace::OneBodySpace(Orbits orbits1){
 
         orbits = orbits1;
@@ -10,7 +15,8 @@
         channels;
         orbit_index_to_channel_index;
 
-        for (auto o : orbits.orbits){ kappas.push_back(o.k); }
+        for (Orbit o : orbits.orbits){ kappas.push_back(o.k); }
+        kappas.erase ( unique(kappas.begin(), kappas.end()), kappas.end() );
 
         for (int i=0; i < kappas.size(); i++){
             vector <int> idxs;
@@ -22,15 +28,13 @@
             channels.push_back(idxs);
         }
         number_channels = channels.size();
-    }
+    };
 
     ModelSpace::ModelSpace(int Ne1, int Z1, double zeta1, Orbits orbs){
         c;
         Z=Z1;
         Ne=Ne1;
         zeta=zeta1;
-
-        // orbs = orbs1;
 
         set_model_space_from_orbits(orbs);
     }
@@ -40,7 +44,6 @@
         Z=Z1;
         Ne=Ne1;
         zeta=zeta1;
-
     }
     
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
