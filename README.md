@@ -1,9 +1,7 @@
 # DHF
-##Dirac-Hartree-Fock Implementation for C++
+### Dirac-Hartree-Fock Implementation for C++
 
-Relative header files implemented
-
-###Necessary Libraries:
+### Necessary Libraries:
 GSL
 Armadillo
 Boost
