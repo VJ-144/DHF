@@ -56,7 +56,7 @@ using namespace std;
 
     void Operator::set_hamiltonian(bool one_body, bool two_body) {
         if (one_body) {set_one_body_ham();}
-        // if (two_body) {set_two_body_ham();}
+        if (two_body) {set_two_body_ham();}
     }
 
     void Operator::set_one_body_ham() {
@@ -64,30 +64,24 @@ using namespace std;
         Orbits orbs = ms.orbits;
         Mat<double> H;
         H.zeros(orbs.get_num_orbits(), orbs.get_num_orbits());
-        S.zeros(orbs.get_num_orbits(), orbs.get_num_orbits());
-
+        // S.zeros(orbs.get_num_orbits(), orbs.get_num_orbits());
+        int fac;
         for (int i=0; i<orbs.get_num_orbits(); i++){
             for (int j=0; j<orbs.get_num_orbits(); j++){
                 Orbit oi = orbs.get_orbit(i);
                 Orbit oj = orbs.get_orbit(j);
-                int fac;
+                
                 if (oi.e== 1 && oj.e== 1) {fac = 1;}
                 if (oi.e==-1 && oj.e==-1) {fac =-1;}
                 if (oi.k!=oj.k) {continue;}
-                if (orbs.relativistic) {
-                    // cout << ms.zeta << ms.Z << endl;
-                    // cout << ME_NuclPot(oi,oj,ms.zeta,ms.Z) << endl;
-                    // cout << "realativistic " << ME_NuclPot(oi,oj,ms.zeta,ms.Z) << endl;
+                if (orbs.relativistic==true) {
                     H(i,j) = ME_Kinetic(oi,oj,ms.zeta,ms.Z) - ms.Z * ME_NuclPot(oi,oj,ms.zeta,ms.Z) + ME_overlap(oi,oj,ms.zeta,ms.Z) * pow(ms.c, 2) * (fac-1);
                 } else {
-                    // cout << "realativistic " << ME_NuclPot(oi,oj,ms.zeta,ms.Z) << endl;
                     H(i,j) = ME_Kinetic_nonrel(oi,oj,ms.zeta) - ms.Z * ME_NuclPot(oi,oj,ms.zeta,ms.Z);
                 }
                 S(i,j) = ME_overlap(oi,oj,ms.zeta,ms.Z);
             }
         }
-        // S.print("S");
-        // H.print("H");
         one = H;
     }
 
@@ -97,7 +91,6 @@ using namespace std;
         Orbits orbs = ms.orbits;
 
         for (auto channels : two.Channels) {
-            // cout << channels.first[0] << endl;
             chbra = two_body_space.get_channel(channels.first[0]);
             chket = two_body_space.get_channel(channels.first[1]);
             for (int idxbra=0; idxbra<chbra.get_number_states(); idxbra++) {
@@ -115,11 +108,9 @@ using namespace std;
                     if (a==b) {norm /= sqrt(2);}
                     if (c==d) {norm /= sqrt(2);}
                     double v;
-                    // Commented out for debugging _coulomb
                     v = _coulomb(oa, ob, oc, od, chket.J);
                     v += _coulomb(oa, ob, od, oc, chket.J) * pow( (-1), ( floor( (oc.j+od.j)/2) - chket.J + 1) );
                     v *= norm;
-                    // Not sure if right index for channels
                     two.set_2bme(channels.first[0], channels.first[1], idxbra, idxket, v);
                     // two.set_2bme(channels.first[0], channels.first[0], idxbra, idxket, v);
                 }
@@ -176,19 +167,9 @@ using namespace std;
         ModelSpace ms = modelspace;
         TwoBodySpace two_body_space = ms.two;
         Orbits orbs = ms.orbits;
-        // mat L(arma::size(S));
-        // L.print("L"); 
-        // S.print("S");
         mat L = arma::chol(S, "lower");
-        // L.print("L");
         Mat<double> T = arma::inv(L);
-        // one = T * one * T.t();
-        // L.print("L");
-        // T.print("T");
-        // one.print("one");
-
-
-
+        one = T * one * T.t();
         if (scalar) {
             /*
             (ab:J|U1 x U2|cd:J) = [ (a|U|c) (b|U|d)
@@ -199,6 +180,7 @@ using namespace std;
             for (auto channels : two.Channels) {
                 TwoBodyChannel tbc = two_body_space.get_channel(channels.first[0]);
                 Mat<double> U;
+                // cout << tbc.get_number_states() << endl;
                 U.zeros(tbc.get_number_states(), tbc.get_number_states());
                 for (int idxbra=0; idxbra<tbc.get_number_states(); idxbra++) {
                     for (int idxket=0; idxket<tbc.get_number_states(); idxket++) {
@@ -241,15 +223,16 @@ using namespace std;
                     for (auto j : one_body_space.channels[ichket]) {  
                         Orbit oi = orbs.get_orbit(i);
                         Orbit oj = orbs.get_orbit(j);
-                        if (! ( abs(oi.j-oj.j) <= 2*rankJ && 2*rankJ <= oi.j+oj.j ) ) {continue;}
-                        if ( pow( (-1), (oi.j+oj.l) ) * rankP == -1 ) {continue;}
-                        cout << setw(2) << i << fixed  << setw(3) << j << one(i,j) << S(i,j) << endl;
+                        if (!( abs(oi.j-oj.j) <= 2*rankJ) && !(2*rankJ <= oi.j+oj.j ) ) {continue;}
+                        // cout << rankP << endl;
+                        if ( pow( (-1), (oi.l+oj.l) ) * rankP == -1 ) {continue;}
+                        printf( "   %-3d  %-3d    %- 3.3e      %- 3f \n", i, j, one(i,j), S(i,j) );
+                        // cout << fixed << setw(2) << i  << setw(3) << j << one(i,j) << S(i,j) << endl;
                     }
                 }
-                two.print_two_body_operator();
             }
         }
-
+        // two.print_two_body_operator();        
     }
 
 
