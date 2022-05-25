@@ -24,7 +24,7 @@ int main() {
     // vector <double> zetainv_list = {0.5, 1, 2, 4};
     vector <double> zetainv_list = {2};
     vector <double> Nmax_list = {1};    
-
+  
     for (auto Nmax : Nmax_list) {
         vector <double> x, y;
         x = {};
@@ -51,10 +51,16 @@ int main() {
             Operator Ham = Operator(ms, 0, 1, 0);
             // Ham.set_hamiltonian(true, false);
             Ham.set_hamiltonian(true, true);
-            // Ham.print_operator();
+            Ham.print_operator();
             Ham.orthogonalize(true);
 
-            HartreeFock HF = HartreeFock(Ham, holes);
+            // Ham.S.print("S");
+
+            // Ham.one.print();
+            // Monopole mon = Monopole(Ham);
+            // the issue is initialising my operator in the header file of HartreeFock.h
+
+            // HartreeFock HF = HartreeFock(Ham, holes);
             // HF.solve();
             // x.push_back(zeta_inv);
             // y.push_back(HF.En);
