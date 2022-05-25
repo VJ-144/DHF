@@ -13,7 +13,7 @@
 #include<tuple>
 #include <string_view>
 
-#include "Orbits.h"
+#include "../header/Orbits.h"
 
 using namespace std;
 using namespace arma;
@@ -115,6 +115,7 @@ using namespace arma;
         j = _k_to_lj(k)[1];
     }
 
+
     void Orbit::set_orbit_nlje(vector<int> nlje) {
         n = nlje[0];
         l = nlje[1];
@@ -122,6 +123,7 @@ using namespace arma;
         e = nlje[3];
         k = _lj_to_k(l, j);
     }
+
 
     void Orbit::set_radial_function_type(string new_radial_function_type) {
         radial_function_type = new_radial_function_type;
@@ -150,8 +152,8 @@ using namespace arma;
             else if (radial_function_type == "LO") { return _laguerre_wave_function_pspace(x, zeta); }
             else if (radial_function_type == "HO") {return _HO_wave_function_pspace(x, zeta); }
             if (radial_function_type == "LSpinor") {
-            if (PQ == 1) { return _LSpinor_P_wave_function_rspace_dr(x, zeta, par); }
-            if (PQ == -1) { return _LSpinor_Q_wave_function_rspace_dr(x, zeta, par); }
+                if (PQ == 1) { return _LSpinor_P_wave_function_rspace_dr(x, zeta, par); }
+                if (PQ == -1) { return _LSpinor_Q_wave_function_rspace_dr(x, zeta, par); }
             } else { throw radial_function_type; }
         }
         catch(string radial_function_type) { cout << "Unknown radial_function_type" << endl; }
@@ -281,7 +283,7 @@ using namespace arma;
         double N = sqrt(pow(n, 2) + 2.0 * n * gam + pow(k, 2));
         double Norm;
         if (N - k == 0) {
-            Norm = 0;
+            Norm = 0.0;
         }
         else {
             Norm = sqrt((tgamma(n + 1) * (2 * gam + n)) / (2 * N * (N - k) * tgamma(2 * gam + n) * zeta));
@@ -301,9 +303,8 @@ using namespace arma;
         double result, error;
         gsl_integration_workspace* w = gsl_integration_workspace_alloc(10000);
 
-        if (o1.e == 1 and o2.e == 1) {
+        if (o1.e == 1 && o2.e == 1) {
 
-            // gsl_function_pp Fp([&](double x)->double {return (o1.eval_radial_function_rspace(x, zeta, Z, o1.e) * o2.eval_radial_function_rspace(x, zeta, Z, o2.e)); });
             auto lambda = [&](double x) { return (o1.eval_radial_function_rspace(x, zeta, Z, o1.e) * o2.eval_radial_function_rspace(x, zeta, Z, o2.e)); };
             gsl_function_pp<decltype(lambda)> Fp(lambda);
             gsl_function* F = static_cast<gsl_function*>(&Fp);
@@ -313,12 +314,10 @@ using namespace arma;
 
             return result;
 
-        } else if ((o1.e == -1 and o2.e == -1)){
+        } else if ((o1.e == -1 && o2.e == -1)){
 
-            // gsl_function_pp Fp([&](double x)->double {return (o1.eval_radial_function_rspace(x, zeta, Z, o1.e) * o2.eval_radial_function_rspace(x, zeta, Z, o2.e)); });
             auto lambda = [&](double x) {return (o1.eval_radial_function_rspace(x, zeta, Z, o1.e) * o2.eval_radial_function_rspace(x, zeta, Z, o2.e)); };
             gsl_function_pp<decltype(lambda)> Fp(lambda);
-            
             gsl_function* F = static_cast<gsl_function*>(&Fp);
 
             gsl_integration_qagiu(F, 0, 1e-6, 1e-6, 10000, w, &result, &error);
@@ -336,26 +335,27 @@ using namespace arma;
         double result, error;
         gsl_integration_workspace* w = gsl_integration_workspace_alloc(10000);
 
-        if (o1.e == 1 and o2.e == 1) {
+        if (o1.e == 1 && o2.e == 1) {
 
-            // gsl_function_pp Fp([&](double x)->double {return (o1.eval_radial_function_rspace(x, zeta, Z, o1.e) * o2.eval_radial_function_rspace(x, zeta, Z, o2.e) / x); });
             auto lambda = [&](double x) { return (o1.eval_radial_function_rspace(x, zeta, Z, o1.e) * o2.eval_radial_function_rspace(x, zeta, Z, o2.e) / x); };
+            
             gsl_function_pp<decltype(lambda)> Fp(lambda);
             gsl_function* F = static_cast<gsl_function*>(&Fp);
-
             gsl_integration_qagiu(F, 0, 1e-6, 1e-6, 10000, w, &result, &error);
             gsl_integration_workspace_free(w);
+
+
+
             return result;
-        } else if (o1.e == -1 and o2.e == -1) {
+        } else if (o1.e == -1 && o2.e == -1) {
 
-            // gsl_function_pp Fp([&](double x)->double {return (o1.eval_radial_function_rspace(x, zeta, Z, o1.e) * o2.eval_radial_function_rspace(x, zeta, Z, o2.e) / x); });
             auto lambda = [&](double x) { return (o1.eval_radial_function_rspace(x, zeta, Z, o1.e) * o2.eval_radial_function_rspace(x, zeta, Z, o2.e) / x); };
+            
             gsl_function_pp<decltype(lambda)> Fp(lambda);
-        
             gsl_function* F = static_cast<gsl_function*>(&Fp);
-
             gsl_integration_qagiu(F, 0, 1e-6, 1e-6, 10000, w, &result, &error);
             gsl_integration_workspace_free(w);
+
             return result;
         }
         else { return 0.0; }
@@ -368,21 +368,22 @@ using namespace arma;
         double result, error;
         gsl_integration_workspace* w = gsl_integration_workspace_alloc(10000);
 
-        if (o1.e == 1 and o2.e == -1) {
+        if (o1.e == 1 && o2.e == -1) {
 
-            // gsl_function_pp Fp([&](double x)->double {return (-o1.eval_radial_function_rspace(x, zeta, Z, o1.e) * (o2.eval_radial_function_rspace_dr(x, zeta, Z, o2.e) - o2.k * o2.eval_radial_function_rspace(x, zeta, Z, o2.e) / x)); });
-            auto lambda = [&](double x) { return (-o1.eval_radial_function_rspace(x, zeta, Z, o1.e) * (o2.eval_radial_function_rspace_dr(x, zeta, Z, o2.e) - o2.k * o2.eval_radial_function_rspace(x, zeta, Z, o2.e) / x)); };
+            auto lambda = [&](double x) { return (-o1.eval_radial_function_rspace(x, zeta, Z, o1.e) *\
+                                                (o2.eval_radial_function_rspace_dr(x, zeta, Z, o2.e) - o2.k *\
+                                                 o2.eval_radial_function_rspace(x, zeta, Z, o2.e) / x)); };
+
             gsl_function_pp<decltype(lambda)> Fp(lambda);
-            
             gsl_function* F = static_cast<gsl_function*>(&Fp);
 
             gsl_integration_qagiu(F, 0, 1e-6, 1e-6, 10000, w, &result, &error);
             gsl_integration_workspace_free(w);
+
             return result * c;
 
-        } else if (o1.e == -1 and o2.e == 1) {
+        } else if (o1.e == -1 && o2.e == 1) {
 
-            // gsl_function_pp Fp([&](double x)->double {return (o1.eval_radial_function_rspace(x, zeta, Z, o1.e) * (o2.eval_radial_function_rspace_dr(x, zeta, Z, o2.e) + o2.k * o2.eval_radial_function_rspace(x, zeta, Z, o2.e) / x)); });
             auto lambda = [&](double x) { return (o1.eval_radial_function_rspace(x, zeta, Z, o1.e) * (o2.eval_radial_function_rspace_dr(x, zeta, Z, o2.e) + o2.k * o2.eval_radial_function_rspace(x, zeta, Z, o2.e) / x)); };
             gsl_function_pp<decltype(lambda)> Fp(lambda);
             
@@ -390,6 +391,7 @@ using namespace arma;
 
             gsl_integration_qagiu(F, 0, 1e-6, 1e-6, 10000, w, &result, &error);
             gsl_integration_workspace_free(w);
+
             return result * c;
 
         } else { return 0.0; }

@@ -1,5 +1,5 @@
-#include "TwoBodySpace.h"
-#include "Orbits.h"
+#include "../header/TwoBodySpace.h"
+#include "../header/Orbits.h"
 
     // Constructor for full parameters
     TwoBodyChannel::TwoBodyChannel(int J1, int P1, int Z1, Orbits orbits1, int e2max1) {
@@ -51,10 +51,12 @@
         for ( int j=0; j<e2max+2; j++) {
             for (int p : {-1,1}) {
                 for ( int z : {-1,0,1} ) {
+                    // cout << j << " " << p << " " << z << endl;
                     TwoBodyChannel channel = TwoBodyChannel(j, p, z, orbits, e2max);
                     if ( channel.get_number_states() == 0 ) { continue; }
                     channels.push_back(channel);
                     int idx = channels.size() - 1;
+                    // cout << idx << endl;
                     index_from_JPZ[{J,P,Z}] = idx;
                 }
             }
@@ -71,17 +73,19 @@
         number_channels = 0;
         e2max;
 
-        e2max = 2*orbits.emax; 
+        e2max = 2*orbits.emax;
 
 
         for ( int j=0; j<e2max+2; j++) {
-            for (int p : {-1,1}) {
+            for (int p : {1,-1}) {
                 for ( int z : {-1,0,1} ) {
-                    TwoBodyChannel channel= TwoBodyChannel(j, p, z, orbits, e2max);
+                    // cout << j << " " << p << " " << z <<  " " << e2max << endl;
+                    TwoBodyChannel channel = TwoBodyChannel(j, p, z, orbits, e2max);
                     if ( channel.get_number_states() == 0 ) { continue; }
                     channels.push_back(channel);
                     int idx = channels.size() - 1;
-                    index_from_JPZ[{J,P,Z}] = idx;
+                    // cout << idx << endl;
+                    index_from_JPZ[{j,p,z}] = idx;
                 }
             }
         number_channels = channels.size();    
@@ -94,9 +98,10 @@
 
     void TwoBodyChannel::_set_two_body_channel(){
         Orbits orbs = orbits;
-        
+        // cout << orbs.orbits.size << endl;
         vector< vector<Orbit> > OaOb = combinCalc(orbs.orbits, 2);
 
+        // cout << OaOb.size() << endl;
         for (int i = 0; i < OaOb.size(); i++) {
 
             Orbit oa = OaOb[i][0];
@@ -105,10 +110,15 @@
             int ia = orbs.get_orbit_index_from_orbit(oa);
             int ib = orbs.get_orbit_index_from_orbit(ob);
 
+            // cout << ia << endl;
+
             if (ia == ib && J%2==1) {continue;}
             if ( (oa.e + ob.e) != 2*Z) {continue;}
             if ( pow((-1), (oa.l + ob.l)) != P) {continue;}
             if ( _triag(oa.j, ob.j, 2*J) ) {continue;}
+            // cout << _triag(oa.j, ob.j, 2*J) << endl;
+            // cout << ia << endl;
+            // cout << ia << " " << ib << endl;
 
             orbit1_index.push_back(ia);
             orbit2_index.push_back(ib);
@@ -123,6 +133,7 @@
             index_from_indices[InvPair] = idx;
             phase_from_indices[Pair] = 1;
             phase_from_indices[InvPair] = pow( -(-1), floor( (oa.j+ob.j)/2 ) - J );
+
         }
         number_states = orbit1_index.size();
     }
@@ -188,6 +199,8 @@
 
     // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     //              Combination Functions
+
+    // vector< vector<Orbit> > comb;
 
     void TwoBodyChannel::combinations_r_recursive(vector<Orbit> elems, int req_len, vector<int> pos, int depth, int margin) {
 	vector<Orbit> pair;

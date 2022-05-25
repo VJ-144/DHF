@@ -1,5 +1,5 @@
 #pragma once
-#include "Orbits.h"
+#include "../header/Orbits.h"
 
 class TwoBodyChannel : public Orbits {
 
@@ -12,7 +12,6 @@ class TwoBodyChannel : public Orbits {
         map<vector<int>, int> phase_from_indices, index_from_indices;
 
         // Constructors
-        // TwoBodyChannel(){};
         TwoBodyChannel();
         TwoBodyChannel(int J1, int P1, int Z1, Orbits orbits1, int e2max1);
         
@@ -26,8 +25,8 @@ class TwoBodyChannel : public Orbits {
 
         // Combination Functions
         void combinations_r(vector<Orbit> elems, int req_len);
-        vector<vector<Orbit>> combinCalc(vector<Orbit> comboVec, int size);        
-        void combinations_r_recursive(vector<Orbit> elems, int req_len, vector<int> pos, int depth, int margin);
+        vector<vector<Orbit>> combinCalc( vector<Orbit> comboVec, int size);        
+        void combinations_r_recursive( vector<Orbit> elems, int req_len, vector<int> pos, int depth, int margin);
 };
 
 
@@ -41,8 +40,8 @@ class TwoBodySpace : public TwoBodyChannel {
         map < vector<int>, int > index_from_JPZ;
 
         // Constructors
-        TwoBodySpace(){};
-        TwoBodySpace(Orbits orbits1);
+        // TwoBodySpace(){};
+        TwoBodySpace(Orbits orbits1 = Orbits() );
         TwoBodySpace(Orbits orbits1, int e2max1);
 
         // Function Declerations

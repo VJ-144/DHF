@@ -1,9 +1,9 @@
 #include<armadillo>
 
-#include "TwoBodyOperator.h"
-#include "TwoBodySpace.h"
-#include "ModelSpace.h"
-#include "Orbits.h"
+#include "../header/TwoBodyOperator.h"
+#include "../header/TwoBodySpace.h"
+#include "../header/ModelSpace.h"
+#include "../header/Orbits.h"
 
 
 using namespace arma;
@@ -24,15 +24,12 @@ using namespace arma;
         rankZ = rankZ1;
         Channels;
 
-        vector<int> vecSize;
-        for (int i=0; i<two_body_space.get_number_channels(); i++) {vecSize.push_back(i);}
-
-        for (int ichbra=0; ichbra<vecSize.size(); ichbra++){
-            for (int ichket=0; ichket<vecSize.size(); ichket++){
+        for (int ichbra=0; ichbra<two_body_space.get_number_channels(); ichbra++){
+            for (int ichket=0; ichket<two_body_space.get_number_channels(); ichket++){
                 if (ichbra < ichket) {continue;}
                 chbra = two_body_space.get_channel(ichbra);
                 chket = two_body_space.get_channel(ichket);
-                if (! (abs(chbra.J-chket.J) <= rankJ && rankJ <= chbra.J+chket.J) ) {continue;}
+                if (! (abs(chbra.J-chket.J) <= rankJ) && !(rankJ <= chbra.J+chket.J) && !(abs(chbra.J-chket.J) <= chbra.J+chket.J)) {continue;}
                 if (chbra.P * chket.P * rankP == -1) {continue;}
                 if (abs(chbra.Z - chket.Z) != rankZ) {continue;}
                 Channels[{ichbra, ichket}] = TwoBodyOperatorChannel(chbra, chket);
@@ -189,30 +186,35 @@ using namespace arma;
         vector<int> NumTwoBodyChannel;
         for (int i=0; i<two_body_space.get_number_channels(); i++) {NumTwoBodyChannel.push_back(i);}
 
-        for (int ichbra=0; ichbra<NumTwoBodyChannel.size(); ichbra++){
-            for (int ichket=0; ichket<NumTwoBodyChannel.size(); ichket++){
+        for (int ichbra=0; ichbra<two_body_space.get_number_channels(); ichbra++){
+            for (int ichket=0; ichket<two_body_space.get_number_channels(); ichket++){
                 
                 if (ichbra < ichket) {continue;}
+                // cout << ichbra << " " << ichket << endl;
                 chbra = two_body_space.get_channel(ichbra);
                 chket = two_body_space.get_channel(ichket);
 
-                if (!(abs(chbra.J-chket.J) <= rankJ && rankJ <= chbra.J+chket.J) ) {continue;}
+                if (!(abs(chbra.J-chket.J) <= rankJ) && !(rankJ <= chbra.J+chket.J) ) {continue;}
                 if (chbra.P * chket.P * rankP == -1) {continue;}
                 if (abs(chbra.Z - chket.Z) != rankZ) {continue;}
+                // cout << chbra.P << " " << chket.P << " " << chbra.Z << " " << chket.Z << endl;
 
                 // vector<int> chbraNumStates, chketNumStates;
                 // for (int i=0; i<chbra.get_number_states(); i++) {chbraNumStates.push_back(i);}
                 // for (int i=0; i<chket.get_number_states(); i++) {chketNumStates.push_back(i);}
-
+                // cout << chbra.get_number_states() << endl;
+                // cout << chbra.get_number_states() << " " << chket.get_number_states() << endl;
                 for (int idxbra=0; idxbra<chbra.get_number_states(); idxbra++){
                     for (int idxket=0; idxket<chket.get_number_states(); idxket++){
-
+                        // cout << idxbra << " " << idxket << endl;
+                        // cout << idxbra << endl;
                         int a = chbra.get_indices(idxbra)[0];
                         int b = chbra.get_indices(idxbra)[1];
                         int c = chket.get_indices(idxket)[0];
                         int d = chket.get_indices(idxket)[1];
 
-                        cout << fixed << setw(4) << a << setw(4) << b << setw(4) << c << setw(4) << d << setw(4) << chbra.J << setw(4) << chket.J << "    " << Channels[{ichbra,ichket}].MEs(idxbra,idxket) << endl; 
+                        // cout << fixed << setw(4) << a << setw(4) << b << setw(4) << c << setw(4) << d << setw(4) << chbra.J << setw(4) << chket.J << "    " << Channels[{ichbra,ichket}].MEs(idxbra,idxket) << endl; 
+                        // printf("   %-3d  %-3d  %-3d  %-3d  %-3d  %-3d  %- 3.3f \n", a, b, c, d, chbra.J, chket.J, Channels[{ichbra,ichket}].MEs(idxbra,idxket) );
                     }
                 }
             }

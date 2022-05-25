@@ -52,7 +52,7 @@ void printMultiVec(const vector< vector<int> > vec) {
 	cout << "vec.size()" << vec.size() << endl;
 	
     for (int i = 0; i < vec.size(); i++) {
-		cout << "vec[i].size()" << vec[i].size() << endl;
+		// cout << "vec[i].size()  " << vec[i].size() << endl;
         for (int j = 0; j < vec[i].size(); j++)
             cout << vec[i][j] << " ";
         cout << endl;

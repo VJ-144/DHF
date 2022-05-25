@@ -1,16 +1,22 @@
 
-#include "Orbits.h"
-#include "ModelSpace.h"
-#include "TwoBodySpace.h"
+#include "../header/Orbits.h"
+#include "../header/ModelSpace.h"
+#include "../header/TwoBodySpace.h"
 
-    OneBodySpace::OneBodySpace(Orbits orbits){
+#include <set>
+#include <armadillo>
+using namespace arma;
+using namespace std;
 
-        orbits = orbits;
+    OneBodySpace::OneBodySpace(Orbits orbits1){
+
+        orbits = orbits1;
         kappas;
         channels;
         orbit_index_to_channel_index;
 
-        for (auto o : orbits.orbits){ kappas.push_back(o.k); }
+        for (Orbit o : orbits.orbits){ kappas.push_back(o.k); }
+        kappas.erase ( unique(kappas.begin(), kappas.end()), kappas.end() );
 
         for (int i=0; i < kappas.size(); i++){
             vector <int> idxs;
@@ -22,23 +28,22 @@
             channels.push_back(idxs);
         }
         number_channels = channels.size();
-    }
+    };
 
-    ModelSpace::ModelSpace(int Ne, int Z, int zeta, Orbits orbs){
+    ModelSpace::ModelSpace(int Ne1, int Z1, double zeta1, Orbits orbs){
         c;
-        Z=1;
-        Ne=1;
-        zeta=1;
+        Z=Z1;
+        Ne=Ne1;
+        zeta=zeta1;
 
         set_model_space_from_orbits(orbs);
     }
 
-    ModelSpace::ModelSpace(int Ne, int Z, int zeta){
+    ModelSpace::ModelSpace(int Ne1, int Z1, double zeta1){
         c;
-        Z;
-        Ne;
-        zeta;
-
+        Z=Z1;
+        Ne=Ne1;
+        zeta=zeta1;
     }
     
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

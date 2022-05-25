@@ -2,8 +2,8 @@
 #include <iostream>
 #include <armadillo>
 
-#include "Orbits.h"
-#include "TwoBodySpace.h"
+#include "../header/Orbits.h"
+#include "../header/TwoBodySpace.h"
 
 using namespace arma;
 
@@ -35,7 +35,6 @@ class TwoBodyOperator : public TwoBodyOperatorChannel {
         // Constructor
         TwoBodyOperator(){};
         TwoBodyOperator(TwoBodySpace two_body_space1, int rankJ1=0, int rankP1=1, int rankZ1=0);
-        // TwoBodyOperator(TwoBodySpace two_body_space1);
 
         int get_2bme(int ichbra, int ichket, int idxbra, int idxket);
         int get_2bme_orbit_indices(int ichbra, int ichket, int a, int b, int c, int d);
