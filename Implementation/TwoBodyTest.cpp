@@ -33,21 +33,21 @@ int main() {
     // ms.set_model_space_from_orbits(orbs);
 
     // TwoBodyOperator Test
-    // Orbits orbs = Orbits();
-    // orbs.set_orbits(2,1);
-    // TwoBodySpace two_body_space =  TwoBodySpace(orbs);
-    // TwoBodyOperator Op2 = TwoBodyOperator(two_body_space);
-    // Op2.print_two_body_operator();
+    Orbits orbs = Orbits();
+    orbs.set_orbits(2,1);
+    TwoBodySpace two_body_space =  TwoBodySpace(orbs);
+    TwoBodyOperator Op2 = TwoBodyOperator(two_body_space);
+    Op2.print_two_body_operator();
 
     // Operator Test
-    Orbits orbs = Orbits("LSpinor", false, true);
-    orbs.set_orbits(1,1);
-    // orbs.print_orbits();
-    ModelSpace ms = ModelSpace(1,2,1);
-    ms.set_model_space_from_orbits(orbs);
-    Operator Ham = Operator(ms, 0, 1, 0);
-    Ham.set_hamiltonian(true, true);
-    Ham.orthogonalize();
+    // Orbits orbs = Orbits("LSpinor", false, true);
+    // orbs.set_orbits(1,1);
+    // // orbs.print_orbits();
+    // ModelSpace ms = ModelSpace(1,2,1);
+    // ms.set_model_space_from_orbits(orbs);
+    // Operator Ham = Operator(ms, 0, 1, 0);
+    // Ham.set_hamiltonian(true, true);
+    // // Ham.orthogonalize();
     // Ham.print_operator();
 
 
