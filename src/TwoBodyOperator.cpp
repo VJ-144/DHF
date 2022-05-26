@@ -1,9 +1,9 @@
 #include<armadillo>
 
-#include "../header/TwoBodyOperator.h"
-#include "../header/TwoBodySpace.h"
-#include "../header/ModelSpace.h"
-#include "../header/Orbits.h"
+#include "../lib/TwoBodyOperator.h"
+#include "../lib/TwoBodySpace.h"
+#include "../lib/ModelSpace.h"
+#include "../lib/Orbits.h"
 
 
 using namespace arma;

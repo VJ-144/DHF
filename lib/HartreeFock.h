@@ -3,11 +3,11 @@
 #include <armadillo>
 #include <cmath>
 
-#include "../header/Orbits.h"
-#include "../header/Operator.h"
-#include "../header/ModelSpace.h"
-#include "../header/TwoBodySpace.h"
-#include "../header/TwoBodyOperator.h"
+#include "../lib/Orbits.h"
+#include "../lib/Operator.h"
+#include "../lib/ModelSpace.h"
+#include "../lib/TwoBodySpace.h"
+#include "../lib/TwoBodyOperator.h"
 
 using namespace std;
 using namespace arma;

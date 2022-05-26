@@ -1,7 +1,6 @@
-
-#include "../header/Orbits.h"
-#include "../header/ModelSpace.h"
-#include "../header/TwoBodySpace.h"
+#include "../lib/TwoBodySpace.h"
+#include "../lib/ModelSpace.h"
+#include "../lib/Orbits.h"
 
 #include <set>
 #include <armadillo>

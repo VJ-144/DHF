@@ -13,7 +13,7 @@
 #include<tuple>
 #include <string_view>
 
-#include "../header/Orbits.h"
+#include "../lib/Orbits.h"
 
 using namespace std;
 using namespace arma;

@@ -1,6 +1,6 @@
 #pragma once
-#include "../header/Orbits.h"
-#include "../header/TwoBodySpace.h"
+#include "../lib/Orbits.h"
+#include "../lib/TwoBodySpace.h"
 
 #include <set>
 

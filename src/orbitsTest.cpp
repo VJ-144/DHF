@@ -6,7 +6,7 @@
 #include <regex>
 #include <armadillo>
 
-#include "Orbits.h"
+#include "../lib/Orbits.h"
 // #include "Orbits_whole.cpp"
 
 

@@ -2,8 +2,8 @@
 #include <iostream>
 #include <armadillo>
 
-#include "../header/Orbits.h"
-#include "../header/TwoBodySpace.h"
+#include "../lib/Orbits.h"
+#include "../lib/TwoBodySpace.h"
 
 using namespace arma;
 

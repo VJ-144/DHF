@@ -1,5 +1,5 @@
-#include "../header/TwoBodySpace.h"
-#include "../header/Orbits.h"
+#include "../lib/TwoBodySpace.h"
+#include "../lib/Orbits.h"
 
     // Constructor for full parameters
     TwoBodyChannel::TwoBodyChannel(int J1, int P1, int Z1, Orbits orbits1, int e2max1) {
