@@ -130,7 +130,7 @@ using namespace arma;
     }
 
     
-    double Orbit::eval_radial_function_rspace(double x, double zeta, double par, double PQ) {
+    double Orbit::eval_radial_function_rspace(double x, double zeta, double par, int PQ) {
         try {
             if (radial_function_type == "default") { return _laguerre_wave_function_rspace(x, zeta); }
             else if (radial_function_type == "LO") { return _laguerre_wave_function_rspace(x, zeta); }
@@ -146,7 +146,7 @@ using namespace arma;
     }
     
     
-    double Orbit::eval_radial_function_rspace_dr(double x, double zeta, double par, double PQ) {
+    double Orbit::eval_radial_function_rspace_dr(double x, double zeta, double par, int PQ) {
         try {
             if (radial_function_type == "default") { return _laguerre_wave_function_pspace(x, zeta); }
             else if (radial_function_type == "LO") { return _laguerre_wave_function_pspace(x, zeta); }
@@ -223,9 +223,14 @@ using namespace arma;
         double gam = _get_pars_Lspinor(zeta, Z)[0];
         double N = _get_pars_Lspinor(zeta, Z)[1];
         double Norm = _get_pars_Lspinor(zeta, Z)[2];
+        
+        // cout << eta << " " << gam << " " << N << " " << Norm << endl; 
         if (Norm == 0.0) { return 0.0; } 
         double T = gsl_sf_laguerre_n(n, 2 * gam, eta) * (N - k) / (n + 2 * gam);
         if (n > 0) { T -= gsl_sf_laguerre_n(n - 1, 2 * gam, eta); } 
+        // printf("   %-3d  %-3e  %-3e  \n", n, 2 * gam, eta);
+        // cout << gsl_sf_laguerre_n(n, 2 * gam, eta) << endl;
+        
         return T * pow(eta, gam) * exp(-0.5 * eta) * Norm;
     }
 
