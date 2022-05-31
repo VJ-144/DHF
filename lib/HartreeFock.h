@@ -37,7 +37,7 @@ class HartreeFock : public Monopole {
         Monopole monopole;
         Mat<double> C, rho, F, V, S;
         vec SPEs;
-        // double r;
+        double r;
         double En;
 
         // Constructor
