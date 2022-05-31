@@ -35,8 +35,8 @@ class Orbit {
         void set_orbit_nke(vector<int> nke);
         void set_orbit_nlje(vector<int> nlje);
         void set_radial_function_type(string new_radial_function_type);
-        double eval_radial_function_rspace(double x, double zeta, double par = 0.0, double PQ = 1.0);
-        double eval_radial_function_rspace_dr(double x, double zeta, double par = 0.0, double PQ = 1.0);
+        double eval_radial_function_rspace(double x, double zeta, double par = 0.0, int PQ = 1);
+        double eval_radial_function_rspace_dr(double x, double zeta, double par = 0.0, int PQ = 1);
         double eval_radial_function_pspace(double p, double zeta);
         double _laguerre_wave_function_rspace(double x, double zeta);
         double _laguerre_wave_function_pspace(double p, double zeta);
