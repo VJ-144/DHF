@@ -49,7 +49,7 @@
         number_channels = 0;
 
         for ( int j=0; j<e2max+2; j++) {
-            for (int p : {-1,1}) {
+            for (int p : {1,-1}) {
                 for ( int z : {-1,0,1} ) {
                     // cout << j << " " << p << " " << z << endl;
                     TwoBodyChannel channel = TwoBodyChannel(j, p, z, orbits, e2max);
@@ -124,18 +124,17 @@
             orbit2_index.push_back(ib);
 
             int idx = orbit1_index.size() - 1;
-            
-            vector<int> Pair, InvPair;
-            Pair = {ia, ib};
-            InvPair = {ib, ia};
+            // cout << idx << endl;
 
-            index_from_indices[Pair] = idx;  
-            index_from_indices[InvPair] = idx;
-            phase_from_indices[Pair] = 1;
-            phase_from_indices[InvPair] = pow( -(-1), floor( (oa.j+ob.j)/2 ) - J );
+            index_from_indices[{ia, ib}] = idx;  
+            index_from_indices[{ib, ia}] = idx;
+            phase_from_indices[{ia, ib}] = 1;
+            phase_from_indices[{ib, ia}] = - pow( (-1), floor( (oa.j+ob.j)/2 ) - J );
+            // cout << - pow( (-1), floor( (oa.j+ob.j)/2 ) - J ) << " " << idx << endl;
 
         }
         number_states = orbit1_index.size();
+        // OaOb.clear();
     }
 
     int TwoBodyChannel::get_number_states() {
