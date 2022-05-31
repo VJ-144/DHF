@@ -22,8 +22,6 @@ using namespace std;
         sort(kappas1.begin(), kappas1.end(), greater<int>());
         // sorting kappas into decreasing order for printing purposes - more similar to python code
 
-
-
         // sort( kappas.begin(), kappas.end() );
         // kappas.erase( unique( kappas.begin(), kappas.end() ), kappas.end() );
 

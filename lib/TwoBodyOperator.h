@@ -15,7 +15,6 @@ class TwoBodyOperatorChannel : public TwoBodySpace {
 
         // Constructor
         TwoBodyOperatorChannel(){};
-        // TwoBodyOperatorChannel(TwoBodyChannel chbra1=TwoBodyChannel(), TwoBodyChannel chket1=TwoBodyChannel());
         TwoBodyOperatorChannel(TwoBodyChannel chbra1, TwoBodyChannel chket1);
 
         int get_2bme(int idxbra, int idxket);

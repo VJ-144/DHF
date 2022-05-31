@@ -109,14 +109,11 @@ using namespace std;
                     if (a==b) {norm /= sqrt(2);}
                     if (c==d) {norm /= sqrt(2);}
                     double v;
-                    // cout << chket.J << endl;
                     v = _coulomb(oa, ob, oc, od, chket.J);
-                    // cout << v << endl;
                     v += _coulomb(oa, ob, od, oc, chket.J) * pow( (-1), ( floor( (oc.j+od.j)/2) - chket.J + 1) );
                     v *= norm;
-                    // cout << v << endl;
                     two.set_2bme(channels.first[0], channels.first[1], idxbra, idxket, v);
-                    two.set_2bme(channels.first[0], channels.first[0], idxket, idxbra, v);
+                    two.set_2bme(channels.first[0], channels.first[1], idxket, idxbra, v);
                 }
             }
         }
@@ -126,23 +123,16 @@ using namespace std;
         if (oa.e != oc.e) {return 0.0;}
         if (ob.e != od.e) {return 0.0;}
         double zeta = modelspace.zeta;
-        // cout << zeta << endl;
         double Z = modelspace.Z;
-        // cout << Z << endl;
         int Lmin = floor( max( abs(oa.j-oc.j), abs(ob.j-od.j) )/2 );
         int Lmax = floor( min(    (oa.j+oc.j),    (ob.j+od.j) )/2 );
-        // printf(" %-3d  %-3d /n", Lmin, Lmax);
-        // cout << Lmin << " " << Lmax << endl;
-
         double rmax = 20; // 20
         int NMesh = 100;  // 100
         gsl_integration_fixed_workspace *workspace;
         const gsl_integration_fixed_type *T = gsl_integration_fixed_legendre;
-        // const gsl_integration_fixed_type *T = gsl_integration_fixed_laguerre;
         workspace = gsl_integration_fixed_alloc(T, NMesh, 0.0, rmax, 0.0, 0.0);
         double r = 0.0;
         for (auto L : irange(Lmin, Lmax+1)) {
-            // cout << L << endl;
             if ( (oa.l+oc.l+L)%2 == 1 ) {continue;}
             if ( (ob.l+od.l+L)%2 == 1 ) {continue;}
             if (abs(oa.l-oc.l) > L or oa.l+oc.l < L) continue;
@@ -150,11 +140,6 @@ using namespace std;
             double angular = gsl_sf_coupling_6j(oa.j, ob.j, 2*J, od.j, oc.j, 2*L) * \
                              gsl_sf_coupling_3j(oa.j, 2*L, oc.j, -1, 0, 1) * \
                              gsl_sf_coupling_3j(ob.j, 2*L, od.j, -1, 0, 1); 
-            // double angular = gsl_sf_coupling_6j(oa.j*0.5, ob.j*0.5, J, od.j*0.5, oc.j*0.5, L) * \
-            //                  gsl_sf_coupling_3j(oa.j*0.5, L, oc.j*0.5, -0.5, 0, 0.5) * \
-            //                  gsl_sf_coupling_3j(ob.j*0.5, L, od.j*0.5, -0.5, 0, 0.);  
-            // if (abs(angular) < 1.8e-8) {continue;}
-            // cout << angular << endl;
             double Integral = 0.0;
             for (int i=0; i<NMesh; i++){
               for (int j=0; j<NMesh; j++){
@@ -162,22 +147,16 @@ using namespace std;
                 double wx = workspace->weights[i];
                 double y = workspace->x[j];
                 double wy = workspace->weights[j];
-                // cout << oa.e << " " << ob.e << " " << oc.e << " " << od.e << endl; 
-                // cout << x << " " << y << endl;
                 Integral += wx * wy * oa.eval_radial_function_rspace(x, zeta, Z, oa.e) * \
                             ob.eval_radial_function_rspace(y, zeta, Z, ob.e) * \
                             oc.eval_radial_function_rspace(x, zeta, Z, oc.e) * \
                             od.eval_radial_function_rspace(y, zeta, Z, od.e) * \
                             pow( min(x,y), L) / pow( max(x,y), (L+1) ) * oa.e * ob.e;
-                // cout << oa.eval_radial_function_rspace(x, zeta, Z, oa.e) << endl;
               }   
             }   
-            // cout << Integral << endl;
-            // cout << angular << endl;
             r += angular * Integral;
         }   
         r *= sqrt( (oa.j+1) * (ob.j+1) * (oc.j+1) * (od.j+1)) * pow( (-1), floor((oa.j+oc.j)/2)+J );
-        // cout << pow( (-1), floor((oa.j+oc.j)/2)+J ) << endl;
         return r;
     }   
 
@@ -198,7 +177,6 @@ using namespace std;
             for (auto channels : two.Channels) {
                 TwoBodyChannel tbc = two_body_space.get_channel(channels.first[0]);
                 Mat<double> U;
-                // cout << tbc.get_number_states() << endl;
                 U.zeros(tbc.get_number_states(), tbc.get_number_states());
                 for (int idxbra=0; idxbra<tbc.get_number_states(); idxbra++) {
                     for (int idxket=0; idxket<tbc.get_number_states(); idxket++) {
@@ -233,15 +211,8 @@ using namespace std;
     void Operator::print_operator(){
         Orbits orbs = modelspace.orbits;
         OneBodySpace one_body_space = modelspace.one;
-        // cout << one_body_space.number_channels << endl;
-        // TwoBodySpace two_body_space = modelspace.two;
         for (int ichbra=0; ichbra<one_body_space.number_channels; ichbra++) {
             for (int ichket=0; ichket<one_body_space.number_channels; ichket++) {
-
-                // vec vect = conv_to< vec >::from(one_body_space.channels[ichbra]);
-                // vect.t().print();
-                
-                // cout << one_body_space.channels[ichbra] << endl;
                 // code runs really slow here ??
                 for (auto i : one_body_space.channels[ichbra]) {
                     for (auto j : one_body_space.channels[ichket]) {  
@@ -250,7 +221,7 @@ using namespace std;
                         Orbit oj = orbs.get_orbit(j);
                         if (!( abs(oi.j-oj.j) <= 2*rankJ && 2*rankJ <= oi.j+oj.j ) ) {continue;}
                         if ( pow( (-1), (oi.l+oj.l) ) * rankP == -1 ) {continue;}
-                        // printf( "   %-3d  %-3d    %- 3.3e      %- 3f \n", i, j, one(i,j), S(i,j) );
+                        printf( "   %-3d  %-3d    %- 3.3e      %- 3f \n", i, j, one(i,j), S(i,j) );
                     }
                 }
             }
