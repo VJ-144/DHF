@@ -3,6 +3,8 @@
 #include "../lib/Orbits.h"
 
 #include <set>
+#include <unordered_set>
+#include <bits/stdc++.h>
 #include <armadillo>
 using namespace arma;
 using namespace std;
@@ -14,22 +16,38 @@ using namespace std;
         channels;
         orbit_index_to_channel_index;
 
-        for (Orbit o : orbits.orbits){ kappas.push_back(o.k); }
-        kappas.erase ( unique(kappas.begin(), kappas.end()), kappas.end() );
+        for (Orbit o : orbits.orbits){ kappas.insert(o.k); }
 
-        for (int i=0; i < kappas.size(); i++){
+        vector<int> kappas1(kappas.begin(), kappas.end());
+        sort(kappas1.begin(), kappas1.end(), greater<int>());
+        // sorting kappas into decreasing order for printing purposes - more similar to python code
+
+
+
+        // sort( kappas.begin(), kappas.end() );
+        // kappas.erase( unique( kappas.begin(), kappas.end() ), kappas.end() );
+
+
+        // unordered_set<int> s( kappas.begin(), kappas.end() );
+        // kappas.assign( s.begin(), s.end() );
+        // sort( kappas.begin(), kappas.end(), greater<int>() );
+
+        // vec vect = conv_to< vec >::from(kappas1);
+        // vect.t().print("kappas1");
+
+        for (int channel_idx=0; channel_idx<kappas1.size(); channel_idx++){
             vector <int> idxs;
             for (auto o : orbits.orbits){
-                if (o.k != kappas[i]) {continue;}
+                if (o.k != kappas1[channel_idx]) {continue;}
                 idxs.push_back(orbits.get_orbit_index_from_orbit(o));
-                orbit_index_to_channel_index[orbits.get_orbit_index_from_orbit(o)] = i;
+                orbit_index_to_channel_index[orbits.get_orbit_index_from_orbit(o)] = channel_idx;
             }
-            channels.push_back(idxs);
+            channels.push_back(idxs);  
         }
         number_channels = channels.size();
     };
 
-    ModelSpace::ModelSpace(int Ne1, int Z1, double zeta1, Orbits orbs){
+    ModelSpace::ModelSpace(int Ne1, double Z1, double zeta1, Orbits orbs){
         c;
         Z=Z1;
         Ne=Ne1;
@@ -38,7 +56,7 @@ using namespace std;
         set_model_space_from_orbits(orbs);
     }
 
-    ModelSpace::ModelSpace(int Ne1, int Z1, double zeta1){
+    ModelSpace::ModelSpace(int Ne1, double Z1, double zeta1){
         c;
         Z=Z1;
         Ne=Ne1;
