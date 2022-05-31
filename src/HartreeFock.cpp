@@ -40,7 +40,7 @@ using namespace arma;
         V.zeros(norbs, norbs);
         SPEs.zeros(norbs);
 
-        double r = UpdateFock();
+        r = UpdateFock();
         DiagonalizeFock();
         UpdateDensityMatrix();
         CalcEnergy();
@@ -92,7 +92,7 @@ using namespace arma;
 
     void HartreeFock::solve() {
         for (int n_iter=0; n_iter<100; n_iter++) {
-            double r = UpdateFock(n_iter);
+            r = UpdateFock(n_iter);
             DiagonalizeFock();
             UpdateDensityMatrix();
             CalcEnergy();
@@ -136,13 +136,13 @@ using namespace arma;
             }
         }
         F = Ham.one + V;
-        double r;
+        double r1;
         for (int i=0; i<norbs; i++) {
             for (int j=0; j<norbs; j++) {
-                r += sqrt( pow(( F(i,j) - Fock_old(i,j) ), 2) );
+                r1 += sqrt( pow(( F(i,j) - Fock_old(i,j) ), 2) );
             }
         }
-        return r;
+        return r1;
     }
 
     void HartreeFock::DiagonalizeFock() {
@@ -161,21 +161,20 @@ using namespace arma;
                 }
             }
 
+            // Fch.print("Fch");
+            // Sch.print("Sch");
+
             cx_vec eigval;
             cx_mat eigvec_col;
             eig_pair( eigval, eigvec_col, Fch, Sch );
             cx_mat eigvec_row = eigvec_col.t();
-            uvec idxs = arma::sort_index(real(eigval), "ascend");
+            // uvec idxs = arma::sort_index(real(eigval), "ascend");
 
             for (int i=0; i<eigvec_col.n_rows; i++) {
 
-                // eigvec_col.col(i).print("col");
-                // eigvec_row.row(i).print("row");
-                // cout << idx << endl;
-                // eigvec_row.print();
-                int idx = idxs(i);                
-                complex<double> norm = arma::as_scalar(eigvec_row.row(idx) * Sch * eigvec_col.col(idx));
-                eigvec_col.col(idx) = -1*eigvec_col.col(idx)/norm;
+                // int idx = idxs(i);                
+                complex<double> norm = arma::as_scalar(eigvec_row.row(i) * Sch * eigvec_col.col(i));
+                eigvec_col.col(i) = -1*eigvec_col.col(i)/norm;
             }
 
             for (auto i : filter_idx) {
@@ -186,8 +185,8 @@ using namespace arma;
 
             for (int i=0; i<filter_idx.size(); i++) { SPEs(i) =  real( eigval(i) ); }
 
-            // C.print("C");
-            // SPEs.print("SPEs");
+            C.print("C");
+            SPEs.print("SPEs");
 
         }
     }
