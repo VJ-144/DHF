@@ -12,7 +12,6 @@ using namespace arma;
     TwoBodyOperatorChannel::TwoBodyOperatorChannel(TwoBodyChannel chbra1, TwoBodyChannel chket1){
         chbra = chbra1;
         chket = chket1;
-
         MEs.zeros(chbra.get_number_states(), chket.get_number_states());
     }
 
@@ -23,15 +22,17 @@ using namespace arma;
         rankP = rankP1;
         rankZ = rankZ1;
         Channels;
-
+        // cout << two_body_space.get_number_channels() << endl;
         for (int ichbra=0; ichbra<two_body_space.get_number_channels(); ichbra++){
             for (int ichket=0; ichket<two_body_space.get_number_channels(); ichket++){
                 if (ichbra < ichket) {continue;}
+                // cout << ichbra << " " << ichket << endl;
                 chbra = two_body_space.get_channel(ichbra);
                 chket = two_body_space.get_channel(ichket);
-                if (! (abs(chbra.J-chket.J) <= rankJ) && !(rankJ <= chbra.J+chket.J) && !(abs(chbra.J-chket.J) <= chbra.J+chket.J)) {continue;}
+                if (! (abs(chbra.J-chket.J) <= rankJ && rankJ <= chbra.J+chket.J)) {continue;}
                 if (chbra.P * chket.P * rankP == -1) {continue;}
                 if (abs(chbra.Z - chket.Z) != rankZ) {continue;}
+                // cout << ichbra << " " << ichket << endl;
                 Channels[{ichbra, ichket}] = TwoBodyOperatorChannel(chbra, chket);
             }
         }
@@ -45,14 +46,11 @@ using namespace arma;
     }
 
     int TwoBodyOperatorChannel::get_2bme_orbit_indices(int a, int b, int c, int d) {
-        vector<int> pairAB, pairCD;
-        pairAB = {a, b};
-        pairCD = {c, d};
 
-        int idxbra = chbra.index_from_indices[pairAB];
-        int idxket = chket.index_from_indices[pairCD];
+        int idxbra = chbra.index_from_indices[{a,b}];
+        int idxket = chket.index_from_indices[{c,d}];
 
-        int phase = chbra.phase_from_indices[pairAB] * chket.phase_from_indices[pairCD];
+        int phase = chbra.phase_from_indices[{a,b}] * chket.phase_from_indices[{c,d}];
 
         return get_2bme(idxbra, idxket) * phase;
     }
@@ -68,11 +66,12 @@ using namespace arma;
         return get_2bme_orbit_indices(a, b, c, d);
     }
 
-    void TwoBodyOperatorChannel::set_2bme(int idxbra, int idxket, int v) {
+    void TwoBodyOperatorChannel::set_2bme(int idxbra, int idxket, double v) {
+        // cout << v << endl;
         MEs(idxbra, idxket) = v;
     }
 
-    void TwoBodyOperatorChannel::set_2bme_orbit_indices(int a, int b, int c, int d, int v) {
+    void TwoBodyOperatorChannel::set_2bme_orbit_indices(int a, int b, int c, int d, double v) {
         vector<int> pairAB, pairCD;
         pairAB = {a,b};
         pairCD = {c,d};
@@ -80,10 +79,11 @@ using namespace arma;
         int idxbra = chbra.index_from_indices[pairAB];
         int idxket = chket.index_from_indices[pairCD];
         int phase = chbra.phase_from_indices[pairAB] * chket.phase_from_indices[pairCD];
+        // cout << "phase" << chbra.phase_from_indices[pairAB] << endl;
         set_2bme(idxbra, idxket, phase*v);
     }
 
-    void TwoBodyOperatorChannel::set_2bme_orbits(Orbit oa, Orbit ob, Orbit oc, Orbit od, int v) {
+    void TwoBodyOperatorChannel::set_2bme_orbits(Orbit oa, Orbit ob, Orbit oc, Orbit od, double v) {
         Orbits orbs = chket.orbits;
 
         int a = orbs.get_orbit_index_from_orbit(oa);
@@ -126,6 +126,8 @@ using namespace arma;
         int ichbra = two_body_space.get_index(JPZ_ab);
         int ichket = two_body_space.get_index(JPZ_cd);
 
+        // cout << ichbra << ichket << endl;
+
         return get_2bme_orbits(ichbra,ichket,oa,ob,oc,od);
     }
 
@@ -138,22 +140,22 @@ using namespace arma;
         return get_2bme_orbitsJ(oa, ob, oc, od, Jab, Jcd);
     }
 
-    void TwoBodyOperator::set_2bme(int ichbra, int ichket, int idxbra, int idxket, int v) {
+    void TwoBodyOperator::set_2bme(int ichbra, int ichket, int idxbra, int idxket, double v) {
         if (ichbra < ichket) {Channels[{ichket,ichbra}].set_2bme(idxket,idxbra,v);}
         else {Channels[{ichbra,ichket}].set_2bme(idxbra,idxket,v);}
     }
 
-    void TwoBodyOperator::set_2bme_orbit_indices(int ichbra, int ichket, int a, int b, int c, int d, int v) {
+    void TwoBodyOperator::set_2bme_orbit_indices(int ichbra, int ichket, int a, int b, int c, int d, double v) {
         if (ichbra < ichket) {Channels[{ichket,ichbra}].set_2bme_orbit_indices(c,d,a,b,v);}
         else {Channels[{ichbra,ichket}].set_2bme_orbit_indices(a,b,c,d,v);}
     }
 
-    void TwoBodyOperator::set_2bme_orbits(int ichbra, int ichket, Orbit oa, Orbit ob, Orbit oc, Orbit od, int v) {
+    void TwoBodyOperator::set_2bme_orbits(int ichbra, int ichket, Orbit oa, Orbit ob, Orbit oc, Orbit od, double v) {
         if (ichbra < ichket) {Channels[{ichket,ichbra}].set_2bme_orbits(oc,od,oa,ob,v);}
         else {Channels[{ichbra,ichket}].set_2bme_orbits(oa,ob,oc,od,v);}
     }
 
-    void TwoBodyOperator::set_2bme_orbitsJ(Orbit oa, Orbit ob, Orbit oc, Orbit od, int Jab, int Jcd, int v) {
+    void TwoBodyOperator::set_2bme_orbitsJ(Orbit oa, Orbit ob, Orbit oc, Orbit od, int Jab, int Jcd, double v) {
         
         int Pab = pow( -1, (oa.l + ob.l) );
         int Pcd = pow( -1, (oc.l + od.l) );
@@ -169,7 +171,7 @@ using namespace arma;
         set_2bme_orbits(ichbra, ichket, oa, ob, oc, od, v);
     }
 
-    void TwoBodyOperator::set_2bme_orbit_indicesJ(int a, int b, int c, int d, int Jab, int Jcd, int v) {
+    void TwoBodyOperator::set_2bme_orbit_indicesJ(int a, int b, int c, int d, int Jab, int Jcd, double v) {
         Orbits orbs = two_body_space.orbits;
 
         Orbit oa = orbs.get_orbit(a);
@@ -183,9 +185,9 @@ using namespace arma;
     void TwoBodyOperator::print_two_body_operator() {
         // Note sure if this is nessesary here : two_body_space;
    
-        vector<int> NumTwoBodyChannel;
-        for (int i=0; i<two_body_space.get_number_channels(); i++) {NumTwoBodyChannel.push_back(i);}
-
+        // vector<int> NumTwoBodyChannel;
+        // for (int i=0; i<two_body_space.get_number_channels(); i++) {NumTwoBodyChannel.push_back(i);}
+        // cout << two_body_space.get_number_channels() << endl;
         for (int ichbra=0; ichbra<two_body_space.get_number_channels(); ichbra++){
             for (int ichket=0; ichket<two_body_space.get_number_channels(); ichket++){
                 
@@ -194,27 +196,28 @@ using namespace arma;
                 chbra = two_body_space.get_channel(ichbra);
                 chket = two_body_space.get_channel(ichket);
 
-                if (!(abs(chbra.J-chket.J) <= rankJ) && !(rankJ <= chbra.J+chket.J) ) {continue;}
+                if (!(abs(chbra.J-chket.J) <= rankJ && rankJ <= chbra.J+chket.J) ) {continue;}
                 if (chbra.P * chket.P * rankP == -1) {continue;}
                 if (abs(chbra.Z - chket.Z) != rankZ) {continue;}
                 // cout << chbra.P << " " << chket.P << " " << chbra.Z << " " << chket.Z << endl;
+                // cout << chbra.P * chket.P * rankP << endl;
 
                 // vector<int> chbraNumStates, chketNumStates;
                 // for (int i=0; i<chbra.get_number_states(); i++) {chbraNumStates.push_back(i);}
                 // for (int i=0; i<chket.get_number_states(); i++) {chketNumStates.push_back(i);}
-                // cout << chbra.get_number_states() << endl;
+                // cout << chbra1.get_number_states() << endl;
                 // cout << chbra.get_number_states() << " " << chket.get_number_states() << endl;
                 for (int idxbra=0; idxbra<chbra.get_number_states(); idxbra++){
                     for (int idxket=0; idxket<chket.get_number_states(); idxket++){
                         // cout << idxbra << " " << idxket << endl;
+                        // cout << ichbra << " " << ichket << endl;
                         // cout << idxbra << endl;
                         int a = chbra.get_indices(idxbra)[0];
                         int b = chbra.get_indices(idxbra)[1];
                         int c = chket.get_indices(idxket)[0];
                         int d = chket.get_indices(idxket)[1];
-
-                        // cout << fixed << setw(4) << a << setw(4) << b << setw(4) << c << setw(4) << d << setw(4) << chbra.J << setw(4) << chket.J << "    " << Channels[{ichbra,ichket}].MEs(idxbra,idxket) << endl; 
-                        // printf("   %-3d  %-3d  %-3d  %-3d  %-3d  %-3d  %- 3.3f \n", a, b, c, d, chbra.J, chket.J, Channels[{ichbra,ichket}].MEs(idxbra,idxket) );
+                        
+                        printf("   %-3d  %-3d  %-3d  %-3d  %-3d  %-3d  %- 3.6f \n", a, b, c, d, chbra.J, chket.J, Channels[{ichbra,ichket}].MEs(idxbra,idxket) );
                     }
                 }
             }
