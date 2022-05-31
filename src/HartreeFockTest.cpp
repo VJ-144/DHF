@@ -51,16 +51,10 @@ int main() {
             Operator Ham = Operator(ms, 0, 1, 0);
             // Ham.set_hamiltonian(true, false);
             Ham.set_hamiltonian(true, true);
-            Ham.print_operator();
+            // Ham.print_operator();
             Ham.orthogonalize(true);
 
-            // Ham.S.print("S");
-
-            // Ham.one.print();
-            // Monopole mon = Monopole(Ham);
-            // the issue is initialising my operator in the header file of HartreeFock.h
-
-            // HartreeFock HF = HartreeFock(Ham, holes);
+            HartreeFock HF = HartreeFock(Ham, holes);
             // HF.solve();
             // x.push_back(zeta_inv);
             // y.push_back(HF.En);
