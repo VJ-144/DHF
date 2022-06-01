@@ -168,7 +168,13 @@ using namespace arma;
             cx_mat eigvec_col;
             eig_pair( eigval, eigvec_col, Fch, Sch );
             cx_mat eigvec_row = eigvec_col.t();
-            // uvec idxs = arma::sort_index(real(eigval), "ascend");
+            uvec idxs = arma::sort_index(real(eigval), "ascend");
+            
+            // int idx = idxs(ich);                
+            // complex<double> norm = arma::as_scalar(eigvec_row.row(idx) * Sch * eigvec_col.col(idx));
+            // eigvec_col.each_col() += -norm;
+            
+            // eigvec_col.col(idx) = -1*eigvec_col.col(idx)/norm;
 
 
             // Normalising eigenvectors
@@ -179,13 +185,9 @@ using namespace arma;
                 eigvec_col.col(i) = -1*eigvec_col.col(i)/norm;
             }
 
-            for (auto i : filter_idx) {
-                for (auto j : filter_idx) {
-                    C(i,j) = real(eigvec_col(i,j));
-                }
-            }
 
-            for (int i=0; i<filter_idx.size(); i++) { SPEs(i) =  real( eigval(i) ); }
+            SPEs = real(eigval);
+            C = real(eigvec_col);
 
             C.print("C");
             SPEs.print("SPEs");
