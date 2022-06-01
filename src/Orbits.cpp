@@ -556,9 +556,6 @@ using namespace arma;
     }
     
     int Orbits::get_orbit_index(vector<int> nlj) {
-        // nlje_idx.push_back(nlj);
-        // nlje_idx[nlj];
-        // mymap.insert(pair<int,vector<int> >(10, vector<int>()));
         return nlje_idx[nlj];
     } 
     
