@@ -170,6 +170,8 @@ using namespace arma;
             cx_mat eigvec_row = eigvec_col.t();
             // uvec idxs = arma::sort_index(real(eigval), "ascend");
 
+
+            // Normalising eigenvectors
             for (int i=0; i<eigvec_col.n_rows; i++) {
 
                 // int idx = idxs(i);                
