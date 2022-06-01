@@ -38,11 +38,11 @@ using namespace arma;
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //              End of Constructor Overloading
 
-    int TwoBodyOperatorChannel::get_2bme(int idxbra, int idxket) {
+    double TwoBodyOperatorChannel::get_2bme(int idxbra, int idxket) {
         return MEs(idxbra, idxket);
     }
 
-    int TwoBodyOperatorChannel::get_2bme_orbit_indices(int a, int b, int c, int d) {
+    double TwoBodyOperatorChannel::get_2bme_orbit_indices(int a, int b, int c, int d) {
 
         int idxbra = chbra.index_from_indices[{a,b}];
         int idxket = chket.index_from_indices[{c,d}];
@@ -52,7 +52,7 @@ using namespace arma;
         return get_2bme(idxbra, idxket) * phase;
     }
 
-    int TwoBodyOperatorChannel::get_2bme_orbits(Orbit oa, Orbit ob, Orbit oc, Orbit od) {
+    double TwoBodyOperatorChannel::get_2bme_orbits(Orbit oa, Orbit ob, Orbit oc, Orbit od) {
         Orbits orbs = chket.orbits;
 
         int a = orbs.get_orbit_index_from_orbit(oa);
@@ -95,22 +95,22 @@ using namespace arma;
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //      TwoBodyOperator Class Methods
 
-    int TwoBodyOperator::get_2bme(int ichbra, int ichket, int idxbra, int idxket) {
+    double TwoBodyOperator::get_2bme(int ichbra, int ichket, int idxbra, int idxket) {
         if (ichbra < ichket) {return Channels[{ichket,ichbra}].get_2bme(idxket,idxbra);}
         else {return Channels[{ichbra,ichket}].get_2bme(idxbra,idxket);}
     } 
 
-    int TwoBodyOperator::get_2bme_orbit_indices(int ichbra, int ichket, int a, int b, int c, int d) {
+    double TwoBodyOperator::get_2bme_orbit_indices(int ichbra, int ichket, int a, int b, int c, int d) {
         if (ichbra < ichket) {return Channels[{ichket,ichbra}].get_2bme_orbit_indices(c,d,a,b);}
         else {return Channels[{ichbra,ichket}].get_2bme_orbit_indices(a,b,c,d);}
     }
 
-    int TwoBodyOperator::get_2bme_orbits(int ichbra, int ichket, Orbit oa, Orbit ob, Orbit oc, Orbit od) {
+    double TwoBodyOperator::get_2bme_orbits(int ichbra, int ichket, Orbit oa, Orbit ob, Orbit oc, Orbit od) {
         if (ichbra < ichket) {return Channels[{ichket,ichbra}].get_2bme_orbits(oc,od,oa,ob);}
         else {return Channels[{ichbra,ichket}].get_2bme_orbits(oa,ob,oc,od);}
     }
 
-    int TwoBodyOperator::get_2bme_orbitsJ(Orbit oa, Orbit ob, Orbit oc, Orbit od, int Jab, int Jcd) {
+    double TwoBodyOperator::get_2bme_orbitsJ(Orbit oa, Orbit ob, Orbit oc, Orbit od, int Jab, int Jcd) {
         
         int Pab = pow( -1, (oa.l + ob.l));
         int Pcd = pow( -1, (oc.l + od.l));
@@ -126,7 +126,7 @@ using namespace arma;
         return get_2bme_orbits(ichbra,ichket,oa,ob,oc,od);
     }
 
-    int TwoBodyOperator::get_2bme_orbit_indicesJ(int a, int b, int c, int d, int Jab, int Jcd) {
+    double TwoBodyOperator::get_2bme_orbit_indicesJ(int a, int b, int c, int d, int Jab, int Jcd) {
         Orbits orbs = two_body_space.orbits;
         Orbit oa = orbs.get_orbit(a);
         Orbit ob = orbs.get_orbit(b);
