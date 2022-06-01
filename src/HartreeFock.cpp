@@ -40,7 +40,7 @@ using namespace arma;
         V.zeros(norbs, norbs);
         SPEs.zeros(norbs);
 
-        r = UpdateFock();
+        double r = UpdateFock();
         DiagonalizeFock();
         UpdateDensityMatrix();
         CalcEnergy();
@@ -92,7 +92,7 @@ using namespace arma;
 
     void HartreeFock::solve() {
         for (int n_iter=0; n_iter<100; n_iter++) {
-            r = UpdateFock(n_iter);
+            double r = UpdateFock(n_iter);
             DiagonalizeFock();
             UpdateDensityMatrix();
             CalcEnergy();
@@ -109,8 +109,8 @@ using namespace arma;
         for (int i=0; i<norbs; i++) {
             for (int j=0; j<norbs; j++) {
                 Orbit oi = orbs.get_orbit(i);
-                e1 += Ham.one[i,j] * rho[i,j] * (oi.j+1);
-                e2 += V[i,j] * rho[i,j] * 0.5 * (oi.j+1);
+                e1 += Ham.one(i,j) * rho(i,j) * (oi.j+1);
+                e2 += V(i,j) * rho(i,j) * 0.5 * (oi.j+1);
             }
         }
         En = e1+e2;
@@ -130,13 +130,13 @@ using namespace arma;
                 V(i,k) += monopole.v2[idx] * rho[j,l];
             }
             for (int i=0; i<norbs; i++) {
-                for (int j=0; i<i+j; j++) {
+                for (int j=0; j<i+1; j++) {
                     V(j,i) = V(i,j);
                 }
             }
         }
         F = Ham.one + V;
-        double r1;
+        double r1 = 0.0;
         for (int i=0; i<norbs; i++) {
             for (int j=0; j<norbs; j++) {
                 r1 += sqrt( pow(( F(i,j) - Fock_old(i,j) ), 2) );
@@ -178,19 +178,19 @@ using namespace arma;
 
 
             // Normalising eigenvectors
-            for (int i=0; i<eigvec_col.n_rows; i++) {
+            // for (int i=0; i<eigvec_col.n_rows; i++) {
 
-                // int idx = idxs(i);                
-                complex<double> norm = arma::as_scalar(eigvec_row.row(i) * Sch * eigvec_col.col(i));
-                eigvec_col.col(i) = -1*eigvec_col.col(i)/norm;
-            }
+            //     // int idx = idxs(i);                
+            //     complex<double> norm = arma::as_scalar(eigvec_row.row(i) * Sch * eigvec_col.col(i));
+            //     eigvec_col.col(i) = -1*eigvec_col.col(i)/norm;
+            // }
 
 
             SPEs = real(eigval);
             C = real(eigvec_col);
 
-            C.print("C");
-            SPEs.print("SPEs");
+            // C.print("C");
+            // SPEs.print("SPEs");
 
         }
     }
@@ -206,16 +206,17 @@ using namespace arma;
             vector <int> filter_idx = one_body_space.channels[ich];
             vec filter_idx1 = conv_to<vec>::from(filter_idx);
 
-            vec SPEsCh(SPEs.n_cols, fill::zeros);
+            // vec SPEsCh(SPEs.n_cols, fill::zeros);
+            vec SPEsCh = SPEs;
 
             for (int i=0; i<one_body_space.channels[ich].size(); i++) {
                 int idx_spe = one_body_space.channels[ich][i];
                 if (orbs.relativistic) {
-                    if (i < floor(SPEsCh.n_cols/2) ) {
+                    if (i < floor(SPEsCh.n_rows/2) ) {
                         n = i;
                         e =-1;
                     } else {
-                        n = i - floor(SPEsCh.n_cols/2);
+                        n = i - floor(SPEsCh.n_rows/2);
                         e = 1;
                     }
                 } else {
@@ -229,8 +230,8 @@ using namespace arma;
             }
         }
         for ( auto hole_idx : holes) {
-            int occ = holes.at(hole_idx.first);
-            int spe_idx = orbit_idx_to_spe_idx.at(hole_idx.first);
+            int occ = holes[hole_idx.first];
+            int spe_idx = orbit_idx_to_spe_idx[hole_idx.first];
             tmp(spe_idx, spe_idx) = occ;
         }
         rho = C * tmp * C.t();
