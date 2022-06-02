@@ -54,9 +54,9 @@ using namespace arma;
         int norbs = orbs.get_num_orbits();
         for (int i1=0; i1<norbs; i1++) {
             Orbit o1 = orbs.get_orbit(i1);
-            for (int i3=0; i3<norbs; i3++) {
+            for (int i3=0; i3<i1+1; i3++) {
                 Orbit o3 = orbs.get_orbit(i3);
-                if (o1.l != o3.k) {continue;}
+                if (o1.k != o3.k) {continue;}
                 for (int i2=0; i2<norbs; i2++) {
                     for (int i4=0; i4<norbs; i4++) {
                         Orbit o2 = orbs.get_orbit(i2);
@@ -72,7 +72,9 @@ using namespace arma;
                             if (i1==i2 && J%2==1) {continue;}
                             if (i3==i4 && J%2==1) {continue;}
                             v += (2*J+1) * Ham.two.get_2bme_orbitsJ(o1,o2,o3,o4,J,J);
+                            // cout << Ham.two.get_2bme_orbitsJ(o1,o2,o3,o4,J,J) << endl;
                         v *= norm / (o1.j+1);
+                        // cout << v << endl;
                         v2.push_back(v);
                         }
                     }
@@ -84,7 +86,6 @@ using namespace arma;
     void Monopole::print_monopole2() {
         for (int idx=0; idx<idx_to_ijkl.size(); idx++) {
             printf("%d %d %d %d", idx_to_ijkl[idx][0], idx_to_ijkl[idx][1], idx_to_ijkl[idx][2], idx_to_ijkl[idx][3]);
-            // cout << fixed << setw(2) << idx_to_ijkl[idx] << v2[idx] << endl;
             // idx_to_ijkl[idx] contains a vector so need to find a more efficient method
             // need to add v2 but not sure about length of vector
         }
@@ -93,10 +94,11 @@ using namespace arma;
     void HartreeFock::solve() {
         for (int n_iter=0; n_iter<100; n_iter++) {
             double r = UpdateFock(n_iter);
+            // cout << r << endl;
             DiagonalizeFock();
             UpdateDensityMatrix();
             CalcEnergy();
-            _print_status(n_iter);
+            // _print_status(n_iter);
             if (r < 1.8e-8) {break;};
         }
     }
@@ -106,6 +108,7 @@ using namespace arma;
         int norbs = orbs.get_num_orbits();
         double e1 = 0.0;
         double e2 = 0.0;
+        // cout << norbs << endl;
         for (int i=0; i<norbs; i++) {
             for (int j=0; j<norbs; j++) {
                 Orbit oi = orbs.get_orbit(i);
@@ -122,13 +125,18 @@ using namespace arma;
         int norbs = orbs.get_num_orbits();
         Mat<double> V(norbs, norbs, fill::zeros);
         if (n_iter != -1) {
+            // cout << monopole.idx_to_ijkl.size() << endl;
             for (int idx=0; idx<monopole.idx_to_ijkl.size(); idx++) {
                 int i = monopole.idx_to_ijkl[idx][0];
                 int j = monopole.idx_to_ijkl[idx][1];
                 int k = monopole.idx_to_ijkl[idx][2];
                 int l = monopole.idx_to_ijkl[idx][3];
-                V(i,k) += monopole.v2[idx] * rho[j,l];
+                V(i,k) += monopole.v2[idx] * rho(j,l);
+                // cout << monopole.v2[idx] << endl;
+                // printf("  %-3d  %-3d  %-3d  %-3d \n", i, j, k, l);
+            
             }
+        
             for (int i=0; i<norbs; i++) {
                 for (int j=0; j<i+1; j++) {
                     V(j,i) = V(i,j);
@@ -136,6 +144,8 @@ using namespace arma;
             }
         }
         F = Ham.one + V;
+        // V.print();
+        // cout << endl;
         double r1 = 0.0;
         for (int i=0; i<norbs; i++) {
             for (int j=0; j<norbs; j++) {
@@ -203,10 +213,9 @@ using namespace arma;
         Orbits orbs_tmp = Orbits();
         map<int, int> orbit_idx_to_spe_idx;
         for (int ich=0; ich<one_body_space.number_channels; ich++) {
-            vector <int> filter_idx = one_body_space.channels[ich];
-            vec filter_idx1 = conv_to<vec>::from(filter_idx);
+            // vector <int> filter_idx = one_body_space.channels[ich];
+            // vec filter_idx1 = conv_to<vec>::from(filter_idx);
 
-            // vec SPEsCh(SPEs.n_cols, fill::zeros);
             vec SPEsCh = SPEs;
 
             for (int i=0; i<one_body_space.channels[ich].size(); i++) {
