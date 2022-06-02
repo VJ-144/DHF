@@ -221,7 +221,7 @@ using namespace std;
                         Orbit oj = orbs.get_orbit(j);
                         if (!( abs(oi.j-oj.j) <= 2*rankJ && 2*rankJ <= oi.j+oj.j ) ) {continue;}
                         if ( pow( (-1), (oi.l+oj.l) ) * rankP == -1 ) {continue;}
-                        printf( "   %-3d  %-3d    %- 3.3e      %- 3f \n", i, j, one(i,j), S(i,j) );
+                        printf( "   %-3d  %-3d    %- 3.6e      %- 3f \n", i, j, one(i,j), S(i,j) );
                     }
                 }
             }
