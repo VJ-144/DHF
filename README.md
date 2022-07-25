@@ -1,7 +1,7 @@
-# DHF
-### Dirac-Hartree-Fock Implementation for C++
 
-### Necessary Libraries:
+# Dirac-Hartree-Fock Implementation for C++
+
+## Necessary Libraries:
 GSL
 Armadillo
 Boost
@@ -11,7 +11,7 @@ Boost
 Run makefile with "make" command to compile excutables
 
 
-Specify parameters:
+## parameters:
 
 NMeshs - controls accuracy on 2-body integral/electron-electron interactions
 
