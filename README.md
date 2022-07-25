@@ -8,7 +8,9 @@ Boost
 
 ## Instructions
 
-Run makefile with "make" command to compile excutables
+Run makefile with "make" command to compile //
+Specify parameters in run.py
+Execute run.py to run code
 
 
 ## parameters:
