@@ -8,8 +8,8 @@ Boost
 
 ## Instructions
 
-Run makefile with "make" command to compile //
-Specify parameters in run.py
+Run makefile with "make" command to compile <br />
+Specify parameters in run.py <br />
 Execute run.py to run code
 
 
