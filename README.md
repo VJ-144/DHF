@@ -15,7 +15,7 @@ Compile program with the command:
 ```
 make clean; make
 ```
-A python wrapper is implemented to edit input parameters and adjust input parameters. After successful building only the execution of '''run.py''' is nessesary for calculations. 
+A python wrapper is implemented to edit input parameters and adjust input parameters. After successful building only the execution of run.py is nessesary for calculations. 
 
 
 ## parameters:
