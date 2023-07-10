@@ -15,24 +15,24 @@ Compile program with the command:
 ```
 make clean; make
 ```
-A python wrapper is implemented to edit input parameters and adjust input parameters. After successful building only the execution of run.py is nessesary for calculations. 
+A python wrapper is implemented to edit input parameters and adjust input parameters. After successful building only the execution of ''run.py'' is nessesary for calculations. 
 
 
 ## parameters:
 
-NMeshs - Controls the mesh grid for the integral evaluating the 2-body electron-electron (coulomb) interaction. This adjusts the fine width the integral is partitioned into. Reducing the NMesh to low will result in inaccurate results as the coulomb interaction ineffectivly calculated, this must be adusted relative to the atomic system of interest.
+NMeshs                 - Controls the mesh grid for the integral evaluating the 2-body electron-electron (coulomb) interaction. This adjusts the                          fine width the integral is partitioned into. Reducing the NMesh to low will result in inaccurate results as the coulomb                          interaction ineffectivly calculated, this must be adusted relative to the atomic system of interest.
 
-orbitals_list - Number and type of electron orbitals to be included in self-consistent field calculation. This determines the model space in which the calculation are conducted. As such they must be considerable larger than the atomic configuration of the system of interest. A good general approach is to set the model space as x2+1 the atomic configuration. For example, Neon atomic config is 1s2 2s2 2p6 so a suitable model space would be 4s-4p or larger. This must be adjusted approapriatly based on the atomic system of interest for an accurate calculation.
+orbitals_list         - Number and type of electron orbitals to be included in self-consistent field calculation. This determines the model                              space in which the calculation are conducted. As such they must be considerable larger than the atomic configuration of                          the system of interest. A good general approach is to set the model space as x2+1 the atomic configuration. For example,                         Neon atomic config is 1s2 2s2 2p6 so a suitable model space would be 4s-4p or larger. This must be adjusted                                      approapriatly based on the atomic system of interest for an accurate calculation.
 
-atoms - Relevant atomic system of interest. A full list can be found in the 
+atoms                  - Atomic system of interest, a full list of atomic configurations can be found in the ModelSpace.cc
 
-zetai_list - arbitary scaling parameter used to tweak convergence
+zetai_list             - Arbitary scaling parameter used to tweak convergence.
 
-radial_function_type - radial functions describing spatial dependence of Dirac Spinor wavefunction
+radial_function_type   - Radial functions describing spatial dependence of Dirac Spinor wavefunction. Refer to source code for alternate radial                           implementations.
 
-eeintegral_mesh_type - Mesh type for 2-body integral
+eeintegral_mesh_type   - Mesh type for 2-body coulomb integral.
 
-eeintegral_rmax - upper limit of 2-body integral 
+eeintegral_rmax        - upper limit of 2-body coulomb integral.
 
 
 
