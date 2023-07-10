@@ -10,7 +10,7 @@ GSL
 Armadillo
 Boost
 
-## Run Instructions
+## Run Instructions:
 Compile program with the command:
 ```
 make clean; make
@@ -18,7 +18,7 @@ make clean; make
 A python wrapper is implemented to edit input parameters and adjust input parameters. After successful building only the execution of run.py is nessesary for calculations. 
 
 
-## parameters:
+## Parameters:
 
 NMeshs                 - Controls the mesh grid for the integral evaluating the 2-body electron-electron (coulomb) interaction. This adjusts the                          fine width the integral is partitioned into. Reducing the NMesh to low will result in inaccurate results as the coulomb                          interaction ineffectivly calculated, this must be adusted relative to the atomic system of interest.
 
